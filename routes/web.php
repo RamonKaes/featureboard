@@ -17,7 +17,7 @@ Route::get('products/{product:slug}/roadmap', RoadmapController::class)->name('p
 Route::scopeBindings()->prefix('products/{product:slug}/requests')->name('feature-requests.')->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('create', [FeatureRequestController::class, 'create'])->name('create');
-        Route::get('similar', SimilarFeatureRequestController::class)->name('similar');
+        Route::get('similar', SimilarFeatureRequestController::class)->middleware('throttle:search')->name('similar');
         Route::post('/', [FeatureRequestController::class, 'store'])->name('store');
         Route::get('{featureRequest}/edit', [FeatureRequestController::class, 'edit'])
             ->can('update', 'featureRequest')
@@ -31,8 +31,11 @@ Route::scopeBindings()->prefix('products/{product:slug}/requests')->name('featur
 });
 
 Route::middleware('auth')->group(function () {
-    Route::post('requests/{featureRequest}/vote', [FeatureRequestVoteController::class, 'store'])->name('votes.store');
-    Route::delete('requests/{featureRequest}/vote', [FeatureRequestVoteController::class, 'destroy'])->name('votes.destroy');
+    Route::middleware('throttle:votes')->group(function () {
+        Route::post('requests/{featureRequest}/vote', [FeatureRequestVoteController::class, 'store'])->name('votes.store');
+        Route::delete('requests/{featureRequest}/vote', [FeatureRequestVoteController::class, 'destroy'])->name('votes.destroy');
+    });
+
     Route::put('requests/{featureRequest}/status', FeatureRequestStatusController::class)->name('feature-requests.status.update');
 });
 
