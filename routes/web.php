@@ -31,6 +31,10 @@ Route::scopeBindings()->prefix('products/{product:slug}/requests')->name('featur
 });
 
 Route::middleware('auth')->group(function () {
+    // Fortify registers these routes even though password confirmation is not used.
+    Route::match(['get', 'post'], 'user/confirm-password', fn () => abort(404));
+    Route::get('user/confirmed-password-status', fn () => abort(404));
+
     Route::middleware('throttle:votes')->group(function () {
         Route::post('requests/{featureRequest}/vote', [FeatureRequestVoteController::class, 'store'])->name('votes.store');
         Route::delete('requests/{featureRequest}/vote', [FeatureRequestVoteController::class, 'destroy'])->name('votes.destroy');

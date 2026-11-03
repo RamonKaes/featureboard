@@ -28,8 +28,8 @@ class FeatureRequestController extends Controller
      */
     public function index(Request $request, Product $product): Response
     {
-        $status = $request->enum('status', FeatureRequestStatus::class);
-        $sort = $request->enum('sort', FeatureRequestSort::class) ?? FeatureRequestSort::Votes;
+        $status = FeatureRequestStatus::tryFrom($this->textFilter($request, 'status'));
+        $sort = FeatureRequestSort::tryFrom($this->textFilter($request, 'sort')) ?? FeatureRequestSort::Votes;
 
         $featureRequests = $product->featureRequests()
             ->with('author:id,name')
@@ -106,6 +106,16 @@ class FeatureRequestController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Dein Wunsch wurde gespeichert.']);
 
         return to_route('feature-requests.show', [$product, $featureRequest]);
+    }
+
+    /**
+     * Read a filter that a broken link may have turned into an array.
+     */
+    private function textFilter(Request $request, string $name): string
+    {
+        $value = $request->query($name);
+
+        return is_string($value) ? $value : '';
     }
 
     private function withViewerData(FeatureRequest $featureRequest, ?User $viewer): FeatureRequest

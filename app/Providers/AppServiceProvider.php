@@ -12,6 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -32,6 +33,16 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configureRateLimiting();
+        $this->configureRoutePatterns();
+    }
+
+    /**
+     * PostgreSQL throws on an id that is not a bigint, so such a value must not reach the query.
+     * Eighteen digits always fit, and the router answers everything else with a 404.
+     */
+    protected function configureRoutePatterns(): void
+    {
+        Route::pattern('featureRequest', '[0-9]{1,18}');
     }
 
     /**

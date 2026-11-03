@@ -16,7 +16,7 @@ trait PasswordValidationRules
      */
     protected function passwordRules(): array
     {
-        return ['required', 'string', Password::default(), 'confirmed'];
+        return ['bail', 'required', 'string', Password::default(), 'confirmed'];
     }
 
     /**
@@ -26,6 +26,6 @@ trait PasswordValidationRules
      */
     protected function currentPasswordRules(): array
     {
-        return ['required', 'string', 'current_password'];
+        return ['bail', 'required', 'string', 'current_password'];
     }
 }
