@@ -21,6 +21,7 @@ defineProps<{
         </h1>
 
         <FeatureRequestForm
+            :product="product"
             :action="store.form(product.slug)"
             :cancel-href="index(product.slug)"
             submit-label="Wunsch einreichen"

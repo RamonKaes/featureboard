@@ -25,6 +25,8 @@ const route = {
         <h1 class="text-2xl font-semibold">Wunsch bearbeiten</h1>
 
         <FeatureRequestForm
+            :product="product"
+            :feature-request-id="featureRequest.id"
             :action="update.form(route)"
             :cancel-href="show(route)"
             :title="featureRequest.title"

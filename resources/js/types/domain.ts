@@ -26,6 +26,11 @@ export type FeatureRequest = {
     };
 };
 
+export type SimilarFeatureRequest = Pick<
+    FeatureRequest,
+    'id' | 'title' | 'status' | 'votesCount'
+>;
+
 export type SelectOption = {
     value: string;
     label: string;

@@ -1,20 +1,26 @@
 <script setup lang="ts">
 import { Form, Link } from '@inertiajs/vue3';
 import type { InertiaLinkProps } from '@inertiajs/vue3';
-import { nextTick } from 'vue';
+import { nextTick, ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import SimilarFeatureRequests from '@/components/SimilarFeatureRequests.vue';
+import type { Product } from '@/types';
 
-defineProps<{
+const props = defineProps<{
+    product: Product;
     action: { action: string; method: 'get' | 'post' };
     cancelHref: NonNullable<InertiaLinkProps['href']>;
     submitLabel: string;
     title?: string;
     description?: string;
+    featureRequestId?: number;
 }>();
+
+const titleInput = ref(props.title ?? '');
 
 async function focusFirstError(): Promise<void> {
     await nextTick();
@@ -34,7 +40,7 @@ async function focusFirstError(): Promise<void> {
             <Input
                 id="title"
                 name="title"
-                :default-value="title"
+                v-model="titleInput"
                 aria-required="true"
                 aria-describedby="title-hint title-error"
                 :aria-invalid="errors.title ? true : undefined"
@@ -43,6 +49,11 @@ async function focusFirstError(): Promise<void> {
                 5 bis 120 Zeichen
             </p>
             <InputError id="title-error" :message="errors.title" />
+            <SimilarFeatureRequests
+                :product="product"
+                :title="titleInput"
+                :except="featureRequestId"
+            />
         </div>
 
         <div class="grid gap-2">
