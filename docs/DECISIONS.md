@@ -148,3 +148,38 @@ The unique vote, valid statuses and non-negative counts are database constraints
 **Decision:** German status and sort labels live in the PHP enums, and the frontend receives them as props.
 
 **Reason:** Status rules and labels stay in one place, and the frontend cannot drift from the backend.
+
+## 21. Similar requests with PostgreSQL full-text search
+
+**Context:** While typing a title, the form should show existing requests of the same product, in German and with different word forms.
+
+| Option           | Strength                                                                   | Weakness                                                                         |
+| ---------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Full-text search | Handles word forms and umlauts, ranks by relevance, needs no extra service | Does not split compound words, finds no typos                                    |
+| `pg_trgm`        | Tolerates typos and partial words                                          | Knows no word forms, and scores depend on text length                            |
+| Laravel Scout    | Common API, with Meilisearch or Typesense also typo tolerance              | Another package, and for good results another service, for a single small search |
+
+Measured with `pg_trgm` 1.6: "Mahnung" against "Mahnungen in mehreren Stufen" scores 0.26, and "Grösse" against "Größere Logos" scores 0.17, below the default threshold of 0.3. Full-text search matches both.
+
+**Decision:** A generated `tsvector` column with the `german` configuration, weighted with title A and description B, a GIN index and `ts_rank` for the order.
+
+**Reason:** It solves the actual problem without new infrastructure, and the generated column cannot get out of sync. Measured stems: "Größe", "Groesse" and "Grösse" all become `gross`, and "Rechnung" and "Rechnungen" both become `rechnung`.
+
+**Query:** Words are combined with OR, because a hint should show partial matches. The last word also matches as a prefix from three letters on, because it may be unfinished. The query is built from letters and digits only, so user input cannot contain search operators.
+
+**Known limits, measured:**
+
+- Compound words are not split: `Rechnungsexport` does not match `Export`.
+- Some verb forms have different stems: `versenden` becomes `versend`, `versendet` stays `versendet`.
+- Typos are not found.
+
+**Index use:** `EXPLAIN ANALYZE` on 100,020 synthetic rows, rolled back afterwards:
+
+| Query                                | Plan                                     | Time    |
+| ------------------------------------ | ---------------------------------------- | ------- |
+| Rare word, 20 hits                   | Bitmap Index Scan on the GIN index       | 1.9 ms  |
+| Same query with index scans disabled | Seq Scan                                 | 18.2 ms |
+| Common word, about 40% of all rows   | Parallel Seq Scan, chosen by the planner | 18.7 ms |
+| Small product with 1,000 rows        | Index Scan on `product_id`               | 1.1 ms  |
+
+The planner uses the GIN index when it helps. For very common words a sequential scan is cheaper, and for small products the `product_id` index is. A test confirms that the query can use the GIN index. The index takes about 10 MB for the 28 MB table.

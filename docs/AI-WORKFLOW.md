@@ -69,3 +69,13 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 **Interrupted by the author:** Firefox could not open the local app in stage 3. Claude showed that a fresh Firefox profile works, and the author chose to continue without resolving the cause.
 
 **Corrected by the author:** Nothing so far in this stage.
+
+## Stage 5: Similar requests
+
+**Proposed and built:** Generated `tsvector` column, GIN index, ranked search, a JSON endpoint and a debounced hint in the form.
+
+**Measured before building:** German stems for word forms and umlauts, trigram scores, and available Laravel and Inertia APIs. This replaced raw SQL with `tsvector()->storedAs()` and a hand-written request with `useHttp`.
+
+**Honest result:** The GIN index is only used for selective words. Common words and small products take other plans, which is correct but less impressive than "the index is used". Both are documented.
+
+**Corrected by the author:** Nothing so far in this stage.
