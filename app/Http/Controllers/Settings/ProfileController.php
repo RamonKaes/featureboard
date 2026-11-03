@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Settings;
 
+use App\Actions\DeleteUser;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
@@ -45,11 +46,11 @@ class ProfileController extends Controller
     /**
      * Delete the user's profile.
      */
-    public function destroy(ProfileDeleteRequest $request, #[CurrentUser] User $user): RedirectResponse
+    public function destroy(ProfileDeleteRequest $request, DeleteUser $deleteUser, #[CurrentUser] User $user): RedirectResponse
     {
         Auth::logout();
 
-        $user->delete();
+        $deleteUser->handle($user);
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
