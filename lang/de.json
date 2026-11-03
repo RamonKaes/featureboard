@@ -1,4 +1,9 @@
 {
+    "If you did not request a password reset, no further action is required.": "Falls du das nicht warst, musst du nichts weiter tun.",
     "Password updated.": "Passwort aktualisiert.",
-    "Profile updated.": "Profil aktualisiert."
+    "Profile updated.": "Profil aktualisiert.",
+    "Reset Password": "Passwort zurücksetzen",
+    "Reset Password Notification": "Passwort zurücksetzen",
+    "This password reset link will expire in :count minutes.": "Dieser Link ist :count Minuten lang gültig.",
+    "You are receiving this email because we received a password reset request for your account.": "Du erhältst diese E-Mail, weil jemand das Zurücksetzen deines Passworts angefordert hat."
 }

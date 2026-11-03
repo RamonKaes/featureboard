@@ -15,7 +15,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Profile settings',
+                title: 'Profileinstellungen',
                 href: edit(),
             },
         ],
@@ -27,15 +27,15 @@ const user = computed(() => page.props.auth.user as User);
 </script>
 
 <template>
-    <Head title="Profile settings" />
+    <Head title="Profileinstellungen" />
 
     <h1 class="sr-only">Profile settings</h1>
 
     <div class="flex flex-col space-y-6">
         <Heading
             variant="small"
-            title="Profile"
-            description="Update your name and email address"
+            title="Profil"
+            description="Ändere deinen Namen und deine E-Mail-Adresse"
         />
 
         <Form
@@ -52,13 +52,13 @@ const user = computed(() => page.props.auth.user as User);
                     :default-value="user.name"
                     required
                     autocomplete="name"
-                    placeholder="Full name"
+                    placeholder="Vor- und Nachname"
                 />
                 <InputError class="mt-2" :message="errors.name" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+                <Label for="email">E-Mail-Adresse</Label>
                 <Input
                     id="email"
                     type="email"
@@ -67,14 +67,14 @@ const user = computed(() => page.props.auth.user as User);
                     :default-value="user.email"
                     required
                     autocomplete="username"
-                    placeholder="Email address"
+                    placeholder="E-Mail-Adresse"
                 />
                 <InputError class="mt-2" :message="errors.email" />
             </div>
 
             <div class="flex items-center gap-4">
                 <Button :disabled="processing" data-test="update-profile-button"
-                    >Save</Button
+                    >Speichern</Button
                 >
             </div>
         </Form>

@@ -16,14 +16,14 @@ defineProps<{
 
 defineOptions({
     layout: {
-        title: 'Create an account',
-        description: 'Enter your details below to create your account',
+        title: 'Konto erstellen',
+        description: 'Gib deine Daten ein, um ein Konto zu erstellen',
     },
 });
 </script>
 
 <template>
-    <Head title="Register" />
+    <Head title="Registrieren" />
 
     <Form
         v-bind="store.form()"
@@ -39,21 +39,19 @@ defineOptions({
                     type="text"
                     required
                     v-focus
-                    :tabindex="1"
                     autocomplete="name"
                     name="name"
-                    placeholder="Full name"
+                    placeholder="Vor- und Nachname"
                 />
                 <InputError :message="errors.name" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+                <Label for="email">E-Mail-Adresse</Label>
                 <Input
                     id="email"
                     type="email"
                     required
-                    :tabindex="2"
                     autocomplete="email"
                     name="email"
                     placeholder="email@example.com"
@@ -62,28 +60,26 @@ defineOptions({
             </div>
 
             <div class="grid gap-2">
-                <Label for="password">Password</Label>
+                <Label for="password">Passwort</Label>
                 <PasswordInput
                     id="password"
                     required
-                    :tabindex="3"
                     autocomplete="new-password"
                     name="password"
-                    placeholder="Password"
+                    placeholder="Passwort"
                     :passwordrules="passwordRules"
                 />
                 <InputError :message="errors.password" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="password_confirmation">Confirm password</Label>
+                <Label for="password_confirmation">Passwort bestätigen</Label>
                 <PasswordInput
                     id="password_confirmation"
                     required
-                    :tabindex="4"
                     autocomplete="new-password"
                     name="password_confirmation"
-                    placeholder="Confirm password"
+                    placeholder="Passwort bestätigen"
                     :passwordrules="passwordRules"
                 />
                 <InputError :message="errors.password_confirmation" />
@@ -92,22 +88,18 @@ defineOptions({
             <Button
                 type="submit"
                 class="mt-2 w-full"
-                tabindex="5"
                 :disabled="processing"
                 data-test="register-user-button"
             >
                 <Spinner v-if="processing" />
-                Create account
+                Konto erstellen
             </Button>
         </div>
 
         <div class="text-center text-sm text-muted-foreground">
-            Already have an account?
-            <TextLink
-                :href="login()"
-                class="underline underline-offset-4"
-                :tabindex="6"
-                >Log in</TextLink
+            Schon ein Konto?
+            <TextLink :href="login()" class="underline underline-offset-4"
+                >Anmelden</TextLink
             >
         </div>
     </Form>
