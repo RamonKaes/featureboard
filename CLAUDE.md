@@ -22,6 +22,7 @@ Talk to the author in German. Code, comments, commit messages and the README are
 ```bash
 ./vendor/bin/sail up -d                # start the app on http://localhost:8000
 ./vendor/bin/sail artisan migrate      # migrate the development database
+./vendor/bin/sail artisan migrate:fresh --seed  # reset the database and load demo data
 ./vendor/bin/sail composer test        # Pest
 ./vendor/bin/sail composer lint        # Pint, Larastan, Vite+ check, vue-tsc
 ./vendor/bin/sail composer format      # apply Pint and Vite+ fixes
@@ -38,4 +39,5 @@ Each rule comes from a concrete case.
 - **Starter kit features are chosen once.** `composer create-project` ran `install:features` with defaults, and the command then deleted itself, so all auth features stayed. To choose features, set `LARAVEL_INSTALLER_DEFER_HOOKS=1` during `create-project`.
 - **`laravel/pao` changes tool arguments for AI agents.** `pest --drift` failed with an argument error because pao appends `--no-output` when it detects an agent. Set `PAO_DISABLE=1` when a tool needs its exact arguments or full output.
 - **Local green is not enough.** Eight tests passed locally but failed on a fresh clone because an old `public/build` hid a missing Vite manifest. Replay CI steps in a fresh clone when changing the toolchain.
+- **Check framework APIs before using them.** `Collection::getOrFail()` was used from memory in a seeder, and it does not exist. Look methods up in `vendor/`.
 - **Check the kit's `.gitignore`.** It ignored `CLAUDE.md`, which this project must commit.

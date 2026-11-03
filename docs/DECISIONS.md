@@ -53,3 +53,34 @@
 **Decision:** Sail publishes the app on 8000 and PostgreSQL on 5434, configurable through `APP_PORT` and `FORWARD_DB_PORT`.
 
 **Reason:** Ports 80 and 5432 are taken by local services on the development machine, and Sail's defaults would fail to start.
+
+## 8. Admin role as a boolean
+
+**Context:** The app has two roles, and the brief asks for a simple solution without a permissions framework.
+
+**Options:** A boolean `is_admin`, a `role` column with an enum, or a package such as spatie/laravel-permission.
+
+**Decision:** A boolean `is_admin` that is not mass assignable.
+
+**Reason:** A boolean models exactly two roles, and a third role is not planned. It can become an enum later with a small migration.
+
+## 9. Delete rules for foreign keys
+
+| Foreign key                   | Rule     | Reason                                                                                       |
+| ----------------------------- | -------- | -------------------------------------------------------------------------------------------- |
+| `feature_requests.product_id` | restrict | Deleting a product with requests would destroy user content, so it must be a conscious step. |
+| `feature_requests.user_id`    | set null | Account deletion must work, and other users' votes on the request must survive it.           |
+| `votes.feature_request_id`    | cascade  | A vote has no meaning without its request.                                                   |
+| `votes.user_id`               | cascade  | Account deletion removes the person's votes.                                                 |
+
+**Known gap:** The cascade from `votes.user_id` removes vote rows without lowering `feature_requests.votes_count`. This has to be solved together with the vote actions in stage 3.
+
+## 10. Stored vote count
+
+**Decision:** `feature_requests.votes_count` stores the number of votes, with a check that rejects negative values.
+
+**Reason:** The list sorts and paginates by votes, which a stored and indexable column supports directly. The price is that the count must be kept in sync with the `votes` table, and stage 3 is responsible for that.
+
+## 11. Rules the database cannot enforce
+
+The unique vote, valid statuses and non-negative counts are database constraints. "No vote for your own request", "no vote on finished requests" and the allowed status transitions compare several rows or the previous value, so they belong in the application layer in stage 3.

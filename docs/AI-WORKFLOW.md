@@ -29,3 +29,18 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 **Rejected:** Larastan level max, because the additional findings come from framework return types and could only be silenced.
 
 **Corrected by the author:** Nothing so far in this stage.
+
+## Stage 2: Domain model and database
+
+**Proposed and built:** Migrations, models, the status enum, factories, German demo data and tests, written test-first and committed per concept.
+
+**Decided by Claude, open to review:** A boolean admin flag, the foreign key delete rules, and a stored vote count. See `docs/DECISIONS.md`.
+
+**AI mistakes:**
+
+- Claude used `Collection::getOrFail()` in the seeder without checking it, and the method does not exist. The tests caught it.
+- Claude added `->after('password')` to a migration, which only has an effect on MySQL. Removed before the stage ended.
+
+**Found while designing:** Cascading votes on account deletion would make `votes_count` too high. The gap is documented and assigned to stage 3 instead of being solved outside this stage's scope.
+
+**Corrected by the author:** Nothing so far in this stage.
