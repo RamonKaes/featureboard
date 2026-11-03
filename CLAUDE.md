@@ -33,6 +33,10 @@ Talk to the author in German. Code, comments, commit messages and the README are
 
 Run PHP checks through Sail. `DB_HOST=pgsql` only resolves inside the Sail network.
 
+## Reviews
+
+`/big-review` runs the full audit in `.claude/commands/big-review.md`. Start it in a new session: code gets audited by someone who did not build it. Reports go to `docs/reviews/`, which is not committed.
+
 ## Lessons learned
 
 Each rule comes from a concrete case.
