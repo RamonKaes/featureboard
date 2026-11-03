@@ -31,6 +31,11 @@ export type SimilarFeatureRequest = Pick<
     'id' | 'title' | 'status' | 'votesCount'
 >;
 
+export type RoadmapColumn = {
+    status: FeatureRequestStatus;
+    featureRequests: SimilarFeatureRequest[];
+};
+
 export type SelectOption = {
     value: string;
     label: string;

@@ -5,15 +5,17 @@ import {
     index,
 } from '@/actions/App/Http/Controllers/FeatureRequestController';
 import StatusBadge from '@/components/StatusBadge.vue';
+import StatusChanger from '@/components/StatusChanger.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import VoteButton from '@/components/VoteButton.vue';
 import { formatDate } from '@/lib/formatDate';
-import type { FeatureRequest, Product } from '@/types';
+import type { FeatureRequest, Product, SelectOption } from '@/types';
 
 defineProps<{
     product: Product;
     featureRequest: FeatureRequest;
+    allowedStatuses: SelectOption[];
 }>();
 </script>
 
@@ -44,6 +46,11 @@ defineProps<{
         </div>
 
         <p class="whitespace-pre-line">{{ featureRequest.description }}</p>
+
+        <StatusChanger
+            :feature-request-id="featureRequest.id"
+            :allowed-statuses="allowedStatuses"
+        />
 
         <Button v-if="featureRequest.can.update" variant="outline" as-child>
             <Link

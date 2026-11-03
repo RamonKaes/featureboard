@@ -11,6 +11,7 @@ import SelectField from '@/components/SelectField.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { home, login } from '@/routes';
+import { roadmap } from '@/routes/products';
 import type {
     FeatureRequest,
     FeatureRequestFilters,
@@ -46,7 +47,10 @@ watch([status, sort], () => {
     <Head :title="product.name" />
 
     <div class="space-y-6 px-4 py-6">
-        <TextLink :href="home()" class="text-sm">Alle Produkte</TextLink>
+        <nav aria-label="Produktnavigation" class="flex gap-4 text-sm">
+            <TextLink :href="home()">Alle Produkte</TextLink>
+            <TextLink :href="roadmap(product.slug)">Roadmap</TextLink>
+        </nav>
 
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="space-y-1">
