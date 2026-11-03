@@ -26,7 +26,8 @@ Talk to the author in German. Code, comments, commit messages and the README are
 ./vendor/bin/sail composer test        # Pest
 ./vendor/bin/sail composer lint        # Pint, Larastan, Vite+ check, vue-tsc
 ./vendor/bin/sail composer format      # apply Pint and Vite+ fixes
-./vendor/bin/sail composer check       # lint, test and build
+./vendor/bin/sail composer test:browser  # Pest browser tests, needs npm run browsers:install once
+./vendor/bin/sail composer check       # lint, test, build and browser tests
 ./vendor/bin/sail npm run dev          # Vite dev server
 ```
 
@@ -41,4 +42,7 @@ Each rule comes from a concrete case.
 - **Local green is not enough.** Eight tests passed locally but failed on a fresh clone because an old `public/build` hid a missing Vite manifest. Replay CI steps in a fresh clone when changing the toolchain.
 - **Check framework APIs before using them.** `Collection::getOrFail()` was used from memory in a seeder, and it does not exist. Look methods up in `vendor/`.
 - **Prove that a test can fail.** Concurrency tests stayed green with the row lock removed. Remove the protection temporarily and watch the test turn red before trusting it.
+- **Never assume database ids in tests.** Sequences survive rolled back tests. Accessibility checks on `/requests/1` tested a 404 page and passed. Look ids up and assert the page content first.
+- **Read the full test result.** A failing test looked green because the result line was cut from the output. Check the exit code.
+- **A green tool is not proof.** axe missed two contrast failures, one in `aria-hidden` text and one on input borders. Calculate what the tool does not cover.
 - **Check the kit's `.gitignore`.** It ignored `CLAUDE.md`, which this project must commit.

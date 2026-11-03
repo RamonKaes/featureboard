@@ -89,3 +89,20 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 **Decided by Claude, open to review:** No confirmation before final statuses, and no pagination on the roadmap.
 
 **Corrected by the author:** Nothing so far in this stage.
+
+## Stage 7: Quality
+
+**Proposed and built:** An accessibility audit, translated kit pages, a new logo, rate limits, route protection tests, and browser tests. See `docs/QUALITY.md`.
+
+**AI mistakes:**
+
+- The first accessibility tests used fixed ids like `/requests/1`. Sequences survive rolled back tests, so those paths were 404 pages and passed axe without testing the real page. Tests now check the page content first.
+- A bad regular expression corrupted the logo component and broke the build.
+- `assertSeeIn` does not wait for Vue to render, and two wrong attempts cost about ten minutes of test runs before reading the plugin source.
+- `querySelector('#status-changer-heading, h1')` returns the first match in the document, so the focus always went to the `h1`. Claude first read a failed test as passing, because it had cut the result line from the output. Repeating the test revealed the failure.
+
+**Found by calculating instead of trusting a tool:** Two contrast failures that axe did not report.
+
+**Decided without asking:** Translating the kit pages and replacing the logo, both announced in the reports of earlier stages.
+
+**Corrected by the author:** Nothing so far in this stage.

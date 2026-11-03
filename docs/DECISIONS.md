@@ -197,3 +197,17 @@ The planner uses the GIN index when it helps. For very common words a sequential
 **Decision:** The public roadmap shows all planned, in progress and done requests of a product, sorted by votes.
 
 **Reason:** A roadmap is meant to be seen as a whole, and the data set is small. A product with many finished requests would need a limit on the `done` column.
+
+## 24. Browser tests with the Pest browser plugin
+
+**Options:** Laravel Dusk, or the Pest browser plugin with Playwright.
+
+**Decision:** The Pest browser plugin.
+
+**Reason:** The Laravel 13 documentation recommends it over Dusk for new projects, tests share the database transaction with the app, and it includes axe for accessibility checks. It runs inside the Sail container without extra system packages. Browsers are installed into `node_modules` through `PLAYWRIGHT_BROWSERS_PATH=0`, so nothing is installed globally. The price is about 680 MB in `node_modules`.
+
+## 25. Rate limits per user
+
+**Decision:** 30 votes and 60 searches per minute for each user.
+
+**Reason:** A person will not vote 30 times a minute. The search debounce allows at most about three requests per second while typing, but real typing has far fewer pauses, so 60 leaves room without allowing scraping. The numbers are estimates without real usage data.
