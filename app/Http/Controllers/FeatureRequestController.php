@@ -23,6 +23,8 @@ class FeatureRequestController extends Controller
 {
     private const int PER_PAGE = 5;
 
+    private const int MAX_PAGE_DIGITS = 9;
+
     /**
      * Show the filtered and sorted feature requests of a product.
      */
@@ -36,7 +38,7 @@ class FeatureRequestController extends Controller
             ->withVoteOf($request->user())
             ->when($status, fn ($query) => $query->where('status', $status))
             ->sortedBy($sort)
-            ->paginate(self::PER_PAGE)
+            ->paginate(self::PER_PAGE, page: $this->pageNumber($request))
             ->withQueryString();
 
         return Inertia::render('featureRequests/Index', [
@@ -106,6 +108,16 @@ class FeatureRequestController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Dein Wunsch wurde gespeichert.']);
 
         return to_route('feature-requests.show', [$product, $featureRequest]);
+    }
+
+    /**
+     * Read the page, because the query offset overflows for very large numbers.
+     */
+    private function pageNumber(Request $request): int
+    {
+        $page = $this->textFilter($request, 'page');
+
+        return ctype_digit($page) && strlen($page) <= self::MAX_PAGE_DIGITS ? max(1, (int) $page) : 1;
     }
 
     /**

@@ -70,6 +70,8 @@ function hostileValues(): array
         'decimal' => '1.5',
         'negative' => '-1',
         'overflow' => '99999999999999999999',
+        'largest bigint' => '9223372036854775807',
+        'overflow after multiplying' => '2000000000000000000',
         'very long' => str_repeat('a', 10000),
         'wildcards' => '%_%',
         'markup' => '<script>alert(1)</script>',
@@ -173,6 +175,55 @@ test('no hostile value in the path crashes any route', function (bool $asAdmin) 
 
     expect($errors)->toBe([]);
 })->with(['guest' => false, 'admin' => true]);
+
+test('no hostile cookie crashes any route', function () {
+    $this->actingAs($this->admin);
+
+    $errors = [];
+
+    foreach (attackableRoutes() as $route) {
+        foreach (['appearance', config('session.cookie'), 'XSRF-TOKEN'] as $cookie) {
+            foreach (hostileValues() as $label => $value) {
+                [$method, $uri] = requestFor($route, $this->bindings, []);
+
+                DB::beginTransaction();
+                $status = $this->call($method, $uri, [], [$cookie => $value])->getStatusCode();
+                DB::rollBack();
+
+                if ($status >= 500) {
+                    $errors[] = "{$status} {$method} {$uri} cookie {$cookie} {$label}";
+                }
+            }
+        }
+    }
+
+    expect($errors)->toBe([]);
+});
+
+test('an unknown appearance falls back to the system setting', function (mixed $appearance) {
+    $this->call('GET', '/', [], ['appearance' => $appearance])
+        ->assertOk()
+        ->assertSee("const appearance = 'system';", false);
+})->with([['x'], ['nonsense'], ['\\'], ["'"]]);
+
+test('a valid appearance is still used', function () {
+    $this->call('GET', '/', [], ['appearance' => 'dark'])
+        ->assertOk()
+        ->assertSee("const appearance = 'dark';", false);
+});
+
+test('a page number that cannot exist shows the first page', function (string $page) {
+    $this->get("/products/{$this->product->slug}?page={$page}")
+        ->assertOk()
+        ->assertInertia(fn ($inertia) => $inertia->where('featureRequests.meta.current_page', 1));
+})->with(['2000000000000000000', '9223372036854775807', '99999999999999999999', 'abc', '-1', '0']);
+
+test('a valid page number is still used', function () {
+    FeatureRequest::factory()->count(6)->for($this->product)->create();
+
+    $this->get("/products/{$this->product->slug}?page=2")
+        ->assertInertia(fn ($inertia) => $inertia->where('featureRequests.meta.current_page', 2));
+});
 
 test('a feature request id that cannot exist answers with 404', function (string $id) {
     $this->get("/products/{$this->product->slug}/requests/{$id}")->assertNotFound();
