@@ -106,3 +106,18 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 **Decided without asking:** Translating the kit pages and replacing the logo, both announced in the reports of earlier stages.
 
 **Corrected by the author:** Nothing so far in this stage.
+
+## Stage 8: README and submission
+
+**Proposed and built:** The README, screenshots and a final check from a fresh clone.
+
+**Final check:** A fresh clone was set up with only the README's commands, with its own database volume. All steps worked on the first try, the documented accounts could log in, and `composer check` was green with the browser installed as described.
+
+**Not covered by the final check:** The Sail image was already built on this machine, so the first image build was not repeated. The clone used a local path instead of the GitHub URL, under another folder name to keep its database separate.
+
+**AI mistakes:**
+
+- A failed file write went unnoticed, so the first commit claimed a README but held only screenshots. Claude amended the unpushed commit.
+- The first clone used the same folder name as the project, so it shared the Compose project and database volume with the development setup. Claude noticed before migrating and repeated the check with another name.
+
+**Corrected by the author:** Nothing in this stage.

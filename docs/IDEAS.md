@@ -10,3 +10,4 @@ Ideas outside the current scope. They are not planned work.
 - Limit the `done` column of the roadmap for products with many finished requests.
 - Test the app with a real screen reader.
 - Add security headers such as a Content Security Policy.
+- Add spacing below the back links on the detail and roadmap pages.
