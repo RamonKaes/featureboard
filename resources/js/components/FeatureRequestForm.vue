@@ -35,6 +35,10 @@ async function focusFirstError(): Promise<void> {
         class="space-y-6"
         @error="focusFirstError"
     >
+        <p class="text-sm text-muted-foreground">
+            Alle Felder sind Pflichtfelder.
+        </p>
+
         <div class="grid gap-2">
             <Label for="title">Titel</Label>
             <Input

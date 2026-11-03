@@ -10,8 +10,10 @@ defineProps<{
 </script>
 
 <template>
-    <div
-        class="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10"
+    <main
+        id="main-content"
+        tabindex="-1"
+        class="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 outline-none md:p-10"
     >
         <div class="w-full max-w-sm">
             <div class="flex flex-col gap-8">
@@ -27,7 +29,7 @@ defineProps<{
                                 class="size-9 fill-current text-[var(--foreground)] dark:text-white"
                             />
                         </div>
-                        <span class="sr-only">{{ title }}</span>
+                        <span class="sr-only">Zur Startseite</span>
                     </Link>
                     <div class="space-y-2 text-center">
                         <h1 class="text-xl font-medium">{{ title }}</h1>
@@ -39,5 +41,5 @@ defineProps<{
                 <slot />
             </div>
         </div>
-    </div>
+    </main>
 </template>

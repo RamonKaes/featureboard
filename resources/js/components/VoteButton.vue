@@ -103,7 +103,7 @@ function toggleVote(): void {
         :class="
             cn(
                 classes,
-                'cursor-pointer transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none',
+                'cursor-pointer border-input transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none',
                 featureRequest.hasVoted &&
                     'border-primary bg-primary text-primary-foreground hover:bg-primary/90',
             )
@@ -118,7 +118,7 @@ function toggleVote(): void {
         v-else-if="showLogin"
         :href="login()"
         :aria-label="`Zum Abstimmen anmelden, ${countLabel}`"
-        :class="cn(classes, 'hover:bg-accent')"
+        :class="cn(classes, 'border-input hover:bg-accent')"
     >
         <ChevronUp class="size-4" aria-hidden="true" />
         {{ featureRequest.votesCount }}

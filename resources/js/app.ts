@@ -4,6 +4,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
+import { initializeFocusOnNavigate } from '@/lib/focusOnNavigate';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -38,3 +39,6 @@ initializeTheme();
 
 // This will listen for flash toast data from the server...
 initializeFlashToast();
+
+// This will move the focus to the content when the page changes...
+initializeFocusOnNavigate();
