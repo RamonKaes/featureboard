@@ -57,7 +57,7 @@ Results of the audit in stage 7, measured on 2026-11-03. Target: WCAG 2.2 AA.
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Mass assignment | `is_admin`, `status`, `votes_count`, `user_id` and `product_id` are not fillable. Tested through registration and forms.                                  |
 | Authorization   | A test fails when a route is neither on the public list nor behind `auth`. Policies are checked in routes and actions.                                    |
-| Rate limiting   | Votes 30 and searches 60 requests per minute per user, tested. Login uses Fortify's limit of 5 per minute.                                                |
+| Rate limiting   | Per minute and user: 30 votes, 60 searches, 10 submissions. 10 registrations per hour and address. Tested. Login uses Fortify's limit of 5 per minute.    |
 | XSS             | No `v-html` or unescaped Blade output in the app's own code. A browser test confirms that HTML in user text does not run.                                 |
 | Hostile input   | Every route, field and path parameter is attacked with arrays, NUL bytes, invalid UTF-8 and overflowing ids, as guest and as admin, with no server error. |
 | SQL injection   | Search input reduced to letters and digits and passed as a binding, tested with injection strings.                                                        |
@@ -69,3 +69,19 @@ Results of the audit in stage 7, measured on 2026-11-03. Target: WCAG 2.2 AA.
 ## Static analysis
 
 Larastan runs on level 9 with no baseline, no `ignoreErrors` and no `@phpstan-ignore` comments in the analysed paths. Tests are not analysed, because Pest's `$this` needs extra setup.
+
+## Review of commit bf053a1
+
+A review in a fresh session with Claude Opus 5.5 found 4 blockers, 6 high, 16 medium and 8 low findings, with all machines green. This fixed all blockers and high findings, each with a test that failed first:
+
+| Finding                                         | Fix                                                                                |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Typing a title erased the description           | `v-model` on the textarea, browser tests in either order and after an error        |
+| Contrast below 4.5:1 on four spots              | Colors raised, `tests/Browser/ContrastTest.php` calculates every visible text node |
+| README claims too broad or wrong                | Sentences corrected, missing page and query test added                             |
+| Capitals in an email locked the account out     | Lowercased before validation, login round trip tested                              |
+| Large `page` and malformed cookie gave HTTP 500 | Page limited, cookie checked against known values, guard extended                  |
+| Foreign Host header poisoned the reset link     | `trustHosts()`, active outside local and test environments                         |
+| No limit on submissions and registration        | Rate limits and a test that every writing route has one or a stated exemption      |
+
+The medium and low findings stay open, and moderation stays a documented limitation.

@@ -46,7 +46,7 @@ The first command downloads a browser into `node_modules` and is needed once. `c
 
 Software teams collect feature wishes in emails, tickets and chats, so duplicates pile up and nobody sees what users really want. Featureboard gives each product one public place:
 
-- Users submit wishes and vote for those of others, one vote per person.
+- Users submit wishes and vote for those of others, one vote per account.
 - While someone types a title, the form shows similar existing wishes, so fewer duplicates appear.
 - Admins move wishes through a fixed workflow: `new`, `planned`, `in_progress`, `done`, with `declined` possible from the first two.
 - A public roadmap shows what is planned, in progress and done, without an account.
@@ -68,6 +68,8 @@ The interface is in German, and the code and documentation are in English.
 - **Claude Code** in the Claude desktop app, with the model Claude Opus 5.5, wrote the code, tests and documentation and ran the commands.
 - The app's **built-in browser** was used to check the interface.
 - The **a11y-enforcer** plugin provided the static accessibility scan and the contrast calculation.
+
+The review described under Quality assurance ran with the same tool and model, in a new session without the conversation that built the code. It is not an independent review by another person or model.
 
 The Laravel Boost MCP server was configured, but it failed to connect and was not used. No other AI tools were involved.
 
@@ -107,29 +109,34 @@ The full reasoning, with options and measurements, is in [docs/DECISIONS.md](doc
 
 All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.md) for the audit.
 
-| Check         | Result                                                                        |
-| ------------- | ----------------------------------------------------------------------------- |
-| Tests         | 275 tests with 960 assertions, against PostgreSQL                             |
-| Browser tests | 46 tests with 102 assertions                                                  |
-| Coverage      | 98.2% of lines in `app/`, without browser tests                               |
-| Larastan      | Level 9, 0 errors, no baseline and no ignored errors                          |
-| Pint          | Laravel preset plus strict types and strict comparison                        |
-| Frontend      | Vite+ lint and format, `vue-tsc` without errors                               |
-| Accessibility | axe at its strictest level on all pages, light and dark, 0 issues             |
-| Contrast      | Calculated from rendered colors, at least 4.5:1 for text and 3:1 for borders  |
-| Index use     | `EXPLAIN ANALYZE` on 100,020 rows: 1.9 ms with the GIN index, 18.2 ms without |
-| Query counts  | Constant per page, tested and protected by `preventLazyLoading`               |
-| Rate limits   | 30 votes and 60 searches per minute per user, tested                          |
+| Check         | Result                                                                                                                    |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Tests         | 296 tests with 1,075 assertions, against PostgreSQL                                                                       |
+| Browser tests | 79 tests with 174 assertions                                                                                              |
+| Coverage      | 98.2% of lines in `app/`, without browser tests                                                                           |
+| Larastan      | Level 9, 0 errors, no baseline and no ignored errors                                                                      |
+| Pint          | Laravel preset plus strict types and strict comparison                                                                    |
+| Frontend      | Vite+ lint and format, `vue-tsc` without errors                                                                           |
+| Accessibility | axe at its strictest level on all pages with a route, light and dark, 0 issues                                            |
+| Contrast      | Tested on every visible text node in both themes, including states after an action: at least 4.5:1, or 3:1 for large text |
+| Index use     | `EXPLAIN ANALYZE` on 100,020 rows: 1.9 ms with the GIN index, 18.2 ms without                                             |
+| Query counts  | Constant on product list, request list, detail page and roadmap, tested. `preventLazyLoading` guards lists                |
+| Rate limits   | Per minute and user: 30 votes, 60 searches, 10 submissions. 10 registrations per hour and address. All tested             |
 
 - **Hostile input:** A test takes every route from the router and sends arrays, NUL bytes, invalid UTF-8, overflowing ids and more in every known field and path parameter, as guest and as admin. None may end in a server error.
-- **Concurrency:** Separate processes vote at the same moment against committed rows. Removing the lock or the atomic increment makes these tests fail, which was checked by mutation.
+- **Concurrency:** Separate processes vote at the same moment against committed rows. Removing the lock makes the test for a vote arriving during a decline fail, and removing the increment as well loses votes. Both were checked by mutation.
 - **CI:** GitHub Actions runs Pint, Larastan, the frontend checks, the tests with a PostgreSQL service, the build and the browser tests.
+- **Review:** [`/big-review`](.claude/commands/big-review.md) is a hostile audit that starts blind, without the project's explanations. It runs the machines and mutation tests, attacks every entrance on twelve axes (form, value, structure, identity, frequency, concurrency, volume, time, state, abuse, error path, display), tries abuse with several accounts, measures every claim in this README, and must list what it did not check. The first run found 4 blockers, 6 high, 16 medium and 8 low findings while all checks were green. All blockers and high findings are fixed with tests. The medium and low findings are still open, and no second run has confirmed the fixes yet.
 - **Limits of the tools:** axe missed two contrast failures that the calculation found, so green tools alone are not treated as proof.
 
 ## Known limitations
 
 - **Search:** Compound words are not split, so `Rechnungsexport` does not find `Export`. Some verb forms have different stems, like `versenden` and `versendet`, and typos are not found.
 - **Accessibility:** No test with a real screen reader and no complete manual keyboard walk through every page. Kit dialogs and menus were only checked by axe.
+- **Moderation:** Nothing public can be removed without database access, neither by admins nor by authors. Rate limits slow spam down, but declined requests stay in the list.
+- **One vote per account, not per person:** There is no email verification, so someone with several addresses and connections can vote several times.
+- **Password reset:** It reveals whether an account exists and has no rate limit of its own.
+- **Findings left open:** The review report lists further medium findings, such as focus lost after a vote, English error pages and overflowing long words.
 - **Vote counts:** A direct `$user->delete()` that bypasses the `DeleteUser` action leaves counts too high.
 - **Editing:** The edit form checks its permission without a row lock, so an edit at the exact moment of a status change can still go through.
 - **Status changes:** `done` and `declined` are final and have no confirmation step, so a misclick cannot be undone in the interface.

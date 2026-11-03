@@ -139,7 +139,7 @@ The unique vote, valid statuses and non-negative counts are database constraints
 
 ## 19. Tolerant filters without a form request
 
-**Decision:** List filters use `$request->enum()`, and unknown values fall back to the defaults.
+**Decision:** List filters read plain query strings, and unknown or malformed values fall back to the defaults. The `pageNumber` method treats the page the same way.
 
 **Reason:** A broken link should still show the list rather than a validation redirect. Form requests are used wherever data is written.
 
@@ -227,3 +227,11 @@ The planner uses the GIN index when it helps. For very common words a sequential
 **Reason:** Each fix sits at the cause. `tests/Feature/Security/InputShapeTest.php` reads the routes from the router, so a new route is attacked without anyone remembering to add it.
 
 **Trade-off:** The attack sends about 2,000 requests and takes about 50 seconds of the test run.
+
+## 27. Limits instead of moderation and verification
+
+**Context:** A review measured 120 submissions in 4.6 seconds and 40 registrations in 15.6 seconds, with nobody able to remove anything without database access.
+
+**Decision:** Rate limits for submitting and registering, and a test that every writing route has a limit or a stated exemption. A moderation feature and email verification stay out, and the README names both as limitations.
+
+**Reason:** The limits are small and solve the worst case. Moderation is a feature of its own, and verification was removed on purpose in decision 3, so both are the author's call.

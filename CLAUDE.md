@@ -50,4 +50,6 @@ Each rule comes from a concrete case.
 - **Read the full test result.** A failing test looked green because the result line was cut from the output. Check the exit code.
 - **A green tool is not proof.** axe missed two contrast failures, one in `aria-hidden` text and one on input borders. Calculate what the tool does not cover.
 - **Test hostile input, not only valid input.** `?status[]=done` answered visitors with HTTP 500 after hundreds of green tests. Read the routes from the router, so that new ones are attacked too.
+- **Verify after starting something.** A session asked to use another model ran on the default, and nobody checked until minutes later. Read back what was really set.
+- **Bind every form field the same way.** A `:value` next to a `v-model` in one form slot erased the description on every keystroke in the title, and only one fill order was tested.
 - **Check the kit's `.gitignore`.** It ignored `CLAUDE.md`, which this project must commit.

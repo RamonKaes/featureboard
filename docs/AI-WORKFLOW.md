@@ -135,3 +135,13 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 - The new guard stopped seeing `sort` after the fix changed how the name was read. Its own coverage test caught that.
 
 **Decided by the author:** Fix the errors first, review afterwards in a fresh session, and invite reviewers only after reading the code.
+
+## After stage 8: First big review
+
+**Run:** The review ran in a fresh session with Claude Opus 5.5, not with the model the author asked for. Claude passed the requested model, did not check the result, and only noticed it minutes later. The author chose to keep the run.
+
+**Result:** 4 blockers, 6 high, 16 medium and 8 low findings, with every machine green. Claude reproduced the worst ones before reporting them.
+
+**AI mistakes it found:** Typing a title erased the description since stage 5. Sentences in the README claimed more than was measured. A second English heading came from an accessibility fix in stage 7. The new input guard missed cookies and values just below the overflow it tested.
+
+**Decided by the author:** Fix all blockers and high findings. Medium findings stay open for now.
