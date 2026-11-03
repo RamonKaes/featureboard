@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\FeatureRequestController;
 use App\Http\Controllers\FeatureRequestVoteController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SimilarFeatureRequestController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
@@ -13,6 +14,7 @@ Route::get('products/{product:slug}', [FeatureRequestController::class, 'index']
 Route::scopeBindings()->prefix('products/{product:slug}/requests')->name('feature-requests.')->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('create', [FeatureRequestController::class, 'create'])->name('create');
+        Route::get('similar', SimilarFeatureRequestController::class)->name('similar');
         Route::post('/', [FeatureRequestController::class, 'store'])->name('store');
         Route::get('{featureRequest}/edit', [FeatureRequestController::class, 'edit'])
             ->can('update', 'featureRequest')

@@ -8,6 +8,7 @@ use App\Enums\FeatureRequestSort;
 use App\Enums\FeatureRequestStatus;
 use Database\Factories\FeatureRequestFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,10 +28,13 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  */
 #[Fillable(['title', 'description'])]
+#[Hidden(['search_vector'])]
 class FeatureRequest extends Model
 {
     /** @use HasFactory<FeatureRequestFactory> */
     use HasFactory;
+
+    private const int MIN_PREFIX_LENGTH = 3;
 
     /**
      * The model's default values for attributes.
@@ -71,6 +75,39 @@ class FeatureRequest extends Model
     public function scopeSortedBy(Builder $query, FeatureRequestSort $sort): void
     {
         $query->orderByDesc($sort->column())->orderByDesc('id');
+    }
+
+    /**
+     * Find requests sharing at least one word with the text, the most relevant first.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeSimilarTo(Builder $query, string $text): void
+    {
+        $tsQuery = $this->toTsQuery($text);
+
+        $query->whereRaw("search_vector @@ to_tsquery('german', ?)", [$tsQuery])
+            ->orderByRaw("ts_rank(search_vector, to_tsquery('german', ?)) DESC", [$tsQuery])
+            ->orderByDesc('votes_count')
+            ->orderByDesc('id');
+    }
+
+    /**
+     * Build an OR query from plain words, so search operators in the input have no effect.
+     * The last word may still be incomplete while typing, so it also matches as a prefix.
+     */
+    private function toTsQuery(string $text): string
+    {
+        preg_match_all('/[\p{L}\p{N}]+/u', $text, $matches);
+
+        $words = $matches[0];
+        $last = array_key_last($words);
+
+        if ($last !== null && mb_strlen($words[$last]) >= self::MIN_PREFIX_LENGTH) {
+            $words[$last] .= ':*';
+        }
+
+        return implode(' | ', $words);
     }
 
     /**
