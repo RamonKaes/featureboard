@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\FeatureRequestController;
+use App\Http\Controllers\FeatureRequestStatusController;
 use App\Http\Controllers\FeatureRequestVoteController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SimilarFeatureRequestController;
@@ -30,6 +31,7 @@ Route::scopeBindings()->prefix('products/{product:slug}/requests')->name('featur
 Route::middleware('auth')->group(function () {
     Route::post('requests/{featureRequest}/vote', [FeatureRequestVoteController::class, 'store'])->name('votes.store');
     Route::delete('requests/{featureRequest}/vote', [FeatureRequestVoteController::class, 'destroy'])->name('votes.destroy');
+    Route::put('requests/{featureRequest}/status', FeatureRequestStatusController::class)->name('feature-requests.status.update');
 });
 
 require __DIR__.'/settings.php';

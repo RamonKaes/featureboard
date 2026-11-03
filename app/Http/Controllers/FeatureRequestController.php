@@ -79,6 +79,9 @@ class FeatureRequestController extends Controller
         return Inertia::render('featureRequests/Show', [
             'product' => new ProductResource($product),
             'featureRequest' => new FeatureRequestResource($this->withViewerData($featureRequest, $request->user())),
+            'allowedStatuses' => $request->user()?->can('changeStatus', $featureRequest)
+                ? $this->options($featureRequest->status->allowedTransitions())
+                : [],
         ]);
     }
 

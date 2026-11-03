@@ -6,6 +6,7 @@ return [
     'confirmed' => ':Attribute und die Bestätigung stimmen nicht überein.',
     'current_password' => 'Das Passwort ist nicht korrekt.',
     'email' => ':Attribute muss eine gültige E-Mail-Adresse sein.',
+    'enum' => ':Attribute ist ungültig.',
     'lowercase' => ':Attribute darf nur Kleinbuchstaben enthalten.',
     'max' => [
         'string' => ':Attribute darf höchstens :max Zeichen lang sein.',
@@ -30,6 +31,7 @@ return [
         'email' => 'E-Mail',
         'name' => 'Name',
         'password' => 'Passwort',
+        'status' => 'Status',
         'title' => 'Titel',
     ],
 ];
