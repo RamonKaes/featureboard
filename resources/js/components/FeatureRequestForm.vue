@@ -21,6 +21,7 @@ const props = defineProps<{
 }>();
 
 const titleInput = ref(props.title ?? '');
+const descriptionInput = ref(props.description ?? '');
 
 async function focusFirstError(): Promise<void> {
     await nextTick();
@@ -66,7 +67,7 @@ async function focusFirstError(): Promise<void> {
                 id="description"
                 name="description"
                 rows="6"
-                :value="description"
+                v-model="descriptionInput"
                 aria-required="true"
                 aria-describedby="description-hint description-error"
                 :aria-invalid="errors.description ? true : undefined"

@@ -117,3 +117,44 @@ test('a final status moves the focus to the page heading', function () {
 
     expect($page->script('document.activeElement.tagName'))->toBe('H1');
 });
+
+test('the description survives typing in the title, in either order', function () {
+    $this->actingAs(User::query()->where('email', 'demo@featureboard.test')->sole());
+
+    $page = visit('/products/rechnungsbox/requests/create')->assertSee('Alle Felder sind Pflichtfelder.');
+
+    $page->type('description', 'Erst die Beschreibung')->type('title', 'Dann der Titel');
+
+    expect($page->value('#description'))->toBe('Erst die Beschreibung')
+        ->and($page->value('#title'))->toBe('Dann der Titel');
+});
+
+test('typed text survives a validation error', function () {
+    $this->actingAs(User::query()->where('email', 'demo@featureboard.test')->sole());
+
+    $page = visit('/products/rechnungsbox/requests/create')
+        ->type('title', 'Abc')
+        ->type('description', 'Eine ausreichend lange Beschreibung')
+        ->press('Wunsch einreichen')
+        ->assertSee('Titel muss mindestens 5 Zeichen lang sein.');
+
+    expect($page->value('#description'))->toBe('Eine ausreichend lange Beschreibung')
+        ->and($page->value('#title'))->toBe('Abc');
+});
+
+test('an edit keeps a changed description when the title changes too', function () {
+    $demo = User::query()->where('email', 'demo@featureboard.test')->sole();
+    $this->actingAs($demo);
+    $featureRequest = FeatureRequest::query()->where('title', 'Wiederkehrende Rechnungen automatisch versenden')->sole();
+
+    visit("/products/rechnungsbox/requests/{$featureRequest->id}/edit")
+        ->assertSee('Wunsch bearbeiten')
+        ->fill('description', 'Komplett neu geschriebene Beschreibung')
+        ->type('title', 'Wiederkehrende Rechnungen versenden')
+        ->press('Speichern')
+        ->assertSee('Dein Wunsch wurde gespeichert.');
+
+    expect($featureRequest->fresh()?->description)->toBe('Komplett neu geschriebene Beschreibung')
+        ->and($featureRequest->fresh()?->title)->toBe('Wiederkehrende Rechnungen versenden');
+});
+
