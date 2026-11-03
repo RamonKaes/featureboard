@@ -116,3 +116,35 @@ The unique vote, valid statuses and non-negative counts are database constraints
 **Decision:** Actions call `Gate::forUser()->authorize()` on the locked row instead of leaving authorization to controllers.
 
 **Reason:** The check must see the state inside the lock. A check in the controller would read the row earlier and could be outdated when the write happens.
+
+## 16. Public pages and the header layout
+
+**Decision:** Products, lists and details are public. Submitting, editing and voting need an account. The kit's sidebar, dashboard and welcome page are removed, and `/` shows the products.
+
+**Reason:** A feature board should be readable without an account, and the roadmap in stage 6 has to be public anyway. A placeholder dashboard would only distract from the actual app.
+
+## 17. Optimistic voting with Inertia's own option
+
+**Options:** Local component state with manual rollback, or the `optimistic` visit option of Inertia 3.
+
+**Decision:** The `optimistic` option.
+
+**Reason:** Inertia restores the previous props when a visit fails, and a successful visit replaces them with the server's state. Own rollback code would duplicate this. Measured in the browser with a delayed connection: the count changed from 3 to 2 at once and returned to 3 after a simulated network error. A vote rejected by the server showed a toast and the true state.
+
+## 18. Forbidden Inertia visits become a toast
+
+**Decision:** `bootstrap/app.php` turns a 403 on an Inertia visit into a redirect back with a German toast. Direct page loads keep the plain 403 response.
+
+**Reason:** Inertia would otherwise show the error page in a modal. This case only happens when the state changed after the page loaded, because the interface does not offer forbidden actions.
+
+## 19. Tolerant filters without a form request
+
+**Decision:** List filters use `$request->enum()`, and unknown values fall back to the defaults.
+
+**Reason:** A broken link should still show the list rather than a validation redirect. Form requests are used wherever data is written.
+
+## 20. Stored enum labels in PHP
+
+**Decision:** German status and sort labels live in the PHP enums, and the frontend receives them as props.
+
+**Reason:** Status rules and labels stay in one place, and the frontend cannot drift from the backend.

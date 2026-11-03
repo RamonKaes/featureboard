@@ -57,3 +57,15 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 - Closures created inside a Pest test could not run in a child process, because they carry a generated class as scope. Making them `static` did not help. They now live in global functions.
 
 **Open for the author to review:** Retracting votes stays possible on finished requests, because rules 1 and 5 do not forbid it.
+
+## Stage 4: Interface
+
+**Proposed and built:** Pages for products, lists, details, submitting and editing, German messages, optimistic voting and tests for all routes.
+
+**Decided by Claude, open to review:** Public pages, removing the dashboard and sidebar, five requests per page. Kit pages such as login and settings stay English, because translating them was not part of the stage.
+
+**Checked in the browser:** Optimistic display and rollback with a delayed connection, a vote rejected after the status changed behind the open page, validation errors with focus, escaping of HTML in user text, filters and pagination.
+
+**Interrupted by the author:** Firefox could not open the local app in stage 3. Claude showed that a fresh Firefox profile works, and the author chose to continue without resolving the cause.
+
+**Corrected by the author:** Nothing so far in this stage.
