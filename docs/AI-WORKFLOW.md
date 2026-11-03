@@ -79,3 +79,13 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 **Honest result:** The GIN index is only used for selective words. Common words and small products take other plans, which is correct but less impressive than "the index is used". Both are documented.
 
 **Corrected by the author:** Nothing so far in this stage.
+
+## Stage 6: Admin functions and roadmap
+
+**Proposed and built:** Status buttons on the detail page, a status endpoint, a public roadmap per product, and tests for rights and display.
+
+**Checked in the browser:** The full workflow as admin from new to done, a rejected click on an outdated page, and the roadmap as a guest.
+
+**Decided by Claude, open to review:** No confirmation before final statuses, and no pagination on the roadmap.
+
+**Corrected by the author:** Nothing so far in this stage.

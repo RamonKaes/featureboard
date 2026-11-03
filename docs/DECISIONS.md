@@ -183,3 +183,17 @@ Measured with `pg_trgm` 1.6: "Mahnung" against "Mahnungen in mehreren Stufen" sc
 | Small product with 1,000 rows        | Index Scan on `product_id`               | 1.1 ms  |
 
 The planner uses the GIN index when it helps. For very common words a sequential scan is cheaper, and for small products the `product_id` index is. A test confirms that the query can use the GIN index. The index takes about 10 MB for the 28 MB table.
+
+## 22. Status changes offer only allowed transitions, and the backend checks again
+
+**Decision:** The detail page receives `allowedStatuses`, which is empty for everyone but admins, and shows one button per transition. `ChangeStatus` checks the permission and the transition again on the locked row.
+
+**Reason:** The buttons are a convenience and no protection, because a request can be sent directly and a page can be outdated. `InvalidStatusTransition` renders itself as a redirect with a German toast. Measured in the browser: with the status changed behind an open page, the click was rejected and the page then showed the true status and its transitions.
+
+**Trade-off:** `done` and `declined` are final, and there is no confirmation step, so a misclick cannot be undone in the interface.
+
+## 23. Roadmap without pagination
+
+**Decision:** The public roadmap shows all planned, in progress and done requests of a product, sorted by votes.
+
+**Reason:** A roadmap is meant to be seen as a whole, and the data set is small. A product with many finished requests would need a limit on the `done` column.

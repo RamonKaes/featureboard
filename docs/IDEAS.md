@@ -8,3 +8,5 @@ Ideas outside the current scope. They are not planned work.
 - Replace the Laravel logo from the kit with an own logo.
 - Combine full-text search with `pg_trgm` to also find typos and parts of compound words.
 - Select only the needed columns in lists, so the `tsvector` column is not loaded.
+- Ask for confirmation before the final statuses `done` and `declined`.
+- Limit the `done` column of the roadmap for products with many finished requests.
