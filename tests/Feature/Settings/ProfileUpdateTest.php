@@ -85,3 +85,32 @@ test('correct password must be provided to delete account', function () {
 
     expect($user->fresh())->not->toBeNull();
 });
+
+test('an email address with capitals is stored in lowercase, so the login still works', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), ['name' => $user->name, 'email' => 'New.Address@Example.com'])
+        ->assertRedirect();
+
+    expect($user->fresh()?->email)->toBe('new.address@example.com');
+
+    auth()->logout();
+    $this->flushSession();
+
+    $this->post(route('login.store'), ['email' => 'New.Address@Example.com', 'password' => 'password'])
+        ->assertRedirect();
+
+    $this->assertAuthenticatedAs($user->fresh());
+});
+
+test('an address differing only in case counts as taken', function () {
+    User::factory()->create(['email' => 'taken@example.com']);
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), ['name' => $user->name, 'email' => 'TAKEN@example.com'])
+        ->assertSessionHasErrors('email');
+
+    expect($user->fresh()?->email)->not->toBe('taken@example.com');
+});
