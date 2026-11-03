@@ -61,4 +61,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(FeatureRequest::class);
     }
+
+    /**
+     * @return HasMany<Vote, $this>
+     */
+    public function votes(): HasMany
+    {
+        return $this->hasMany(Vote::class);
+    }
 }
