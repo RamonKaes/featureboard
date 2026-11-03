@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { edit } from '@/routes/profile';
+import type { User } from '@/types';
 
 defineOptions({
     layout: {
@@ -22,7 +23,7 @@ defineOptions({
 });
 
 const page = usePage();
-const user = computed(() => page.props.auth.user);
+const user = computed(() => page.props.auth.user as User);
 </script>
 
 <template>
