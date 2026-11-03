@@ -157,4 +157,3 @@ test('an edit keeps a changed description when the title changes too', function 
     expect($featureRequest->fresh()?->description)->toBe('Komplett neu geschriebene Beschreibung')
         ->and($featureRequest->fresh()?->title)->toBe('Wiederkehrende Rechnungen versenden');
 });
-

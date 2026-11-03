@@ -24,6 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->prepend(RejectMalformedInput::class);
 
+        $middleware->trustHosts();
+
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,

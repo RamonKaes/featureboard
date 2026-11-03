@@ -5,7 +5,10 @@ declare(strict_types=1);
 use App\Models\FeatureRequest;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Route as RoutingRoute;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -84,4 +87,89 @@ test('the shared user data contains no secrets', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->missing('auth.user.password')
             ->missing('auth.user.remember_token'));
+});
+
+test('a foreign host cannot poison the link in the password reset mail', function () {
+    $user = User::factory()->create();
+    Notification::fake();
+    $this->app['env'] = 'production';
+
+    $this->withServerVariables(['HTTP_HOST' => 'evil.example'])
+        ->post('http://evil.example/forgot-password', ['email' => $user->email])
+        ->assertBadRequest();
+
+    Notification::assertNothingSent();
+});
+
+test('the configured host keeps working behind the host check', function () {
+    $user = User::factory()->create();
+    Notification::fake();
+    $this->app['env'] = 'production';
+
+    $this->withoutMiddleware(PreventRequestForgery::class);
+
+    $this->post(config('app.url').'/forgot-password', ['email' => $user->email])->assertRedirect();
+
+    Notification::assertSentTo($user, ResetPassword::class);
+});
+
+test('every writing route has a rate limit or is exempt for a stated reason', function () {
+    $exempt = [
+        'logout' => 'ends the own session',
+        'password.email' => 'open finding M6 of the review',
+        'password.update' => 'open finding M6 of the review',
+        'profile.update' => 'changes only the own account',
+        'profile.destroy' => 'needs the password and ends the account',
+        'feature-requests.status.update' => 'admins only',
+    ];
+
+    $unlimited = collect(Route::getRoutes()->getRoutes())
+        ->filter(fn (RoutingRoute $route) => array_diff($route->methods(), ['GET', 'HEAD', 'OPTIONS']) !== [])
+        ->reject(fn (RoutingRoute $route) => in_array('GET', $route->methods(), true))
+        ->reject(fn (RoutingRoute $route) => collect($route->gatherMiddleware())->contains(fn (string $middleware) => str_starts_with($middleware, 'throttle')))
+        ->reject(fn (RoutingRoute $route) => array_key_exists((string) $route->getName(), $exempt))
+        ->reject(fn (RoutingRoute $route) => str_starts_with($route->uri(), 'storage/') || str_starts_with($route->uri(), 'user/'))
+        ->map(fn (RoutingRoute $route) => implode('|', $route->methods()).' '.$route->uri())
+        ->values();
+
+    expect($unlimited->all())->toBe([]);
+});
+
+test('submitting is limited to 10 requests per minute per user', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create();
+    $input = ['title' => 'Ein gültiger Titel', 'description' => 'Eine gültige Beschreibung.'];
+
+    foreach (range(1, 10) as $attempt) {
+        $this->actingAs($user)->post(route('feature-requests.store', $product), $input)->assertRedirect();
+    }
+
+    $this->actingAs($user)->post(route('feature-requests.store', $product), $input)->assertTooManyRequests();
+    $this->actingAs(User::factory()->create())->post(route('feature-requests.store', $product), $input)->assertRedirect();
+
+    expect(FeatureRequest::query()->count())->toBe(11);
+});
+
+test('registration is limited to 10 accounts per hour per address', function () {
+    foreach (range(1, 10) as $attempt) {
+        auth()->logout();
+
+        $this->post(route('register.store'), [
+            'name' => "Person {$attempt}",
+            'email' => "person{$attempt}@example.com",
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ])->assertRedirect();
+    }
+
+    auth()->logout();
+
+    $this->post(route('register.store'), [
+        'name' => 'One Too Many',
+        'email' => 'toomany@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ])->assertTooManyRequests();
+
+    expect(User::query()->count())->toBe(10);
 });
