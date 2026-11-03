@@ -50,6 +50,7 @@ test('public pages have no accessibility issues', function (Closure $path, strin
     'login' => [fn () => '/login', 'Bei deinem Konto anmelden'],
     'register' => [fn () => '/register', 'Konto erstellen'],
     'forgot password' => [fn () => '/forgot-password', 'Passwort vergessen'],
+    'reset password' => [fn () => '/reset-password/some-token?email=demo@featureboard.test', 'Passwort zurücksetzen'],
 ])->with('color schemes');
 
 test('pages for users have no accessibility issues', function (Closure $path, string $heading, bool $darkMode) {

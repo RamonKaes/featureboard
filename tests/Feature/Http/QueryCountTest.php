@@ -43,3 +43,18 @@ test('the product list needs the same number of queries for one or many rows', f
 
     expect($many)->toBe($one);
 });
+
+test('the detail page needs the same number of queries for few or many votes', function () {
+    $user = User::factory()->create();
+    $featureRequest = FeatureRequest::factory()->create();
+    Vote::factory()->for($featureRequest)->create();
+    $url = route('feature-requests.show', [$featureRequest->product, $featureRequest]);
+
+    $this->actingAs($user);
+    $few = countQueries(fn () => $this->get($url)->assertOk());
+
+    Vote::factory()->count(5)->for($featureRequest)->create();
+    $many = countQueries(fn () => $this->get($url)->assertOk());
+
+    expect($many)->toBe($few);
+});
