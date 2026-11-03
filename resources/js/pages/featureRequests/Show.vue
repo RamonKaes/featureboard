@@ -31,7 +31,7 @@ defineProps<{
             <VoteButton :feature-request="featureRequest" />
 
             <div class="min-w-0 flex-1 space-y-2">
-                <h1 class="text-2xl font-semibold">
+                <h1 tabindex="-1" class="text-2xl font-semibold outline-none">
                     {{ featureRequest.title }}
                 </h1>
                 <div class="flex flex-wrap items-center gap-2">
