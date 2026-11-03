@@ -44,3 +44,16 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 **Found while designing:** Cascading votes on account deletion would make `votes_count` too high. The gap is documented and assigned to stage 3 instead of being solved outside this stage's scope.
 
 **Corrected by the author:** Nothing so far in this stage.
+
+## Stage 3: Business rules
+
+**Proposed and built:** Status transitions in the enum, a policy, the actions `CastVote`, `RetractVote`, `ChangeStatus` and `DeleteUser`, all test-first, plus tests with real concurrent processes.
+
+**Decided by the author:** Nothing new. The `DeleteUser` action was proposed at the end of stage 2 and accepted without objection.
+
+**AI mistakes:**
+
+- Claude's first concurrency tests looked convincing but did not test the lock. A mutation check with the lock removed stayed green. Claude had assumed the lock protected the vote count, which is protected by the atomic `increment` and Laravel's `createOrFirst`. A new test now covers what the lock really protects.
+- Closures created inside a Pest test could not run in a child process, because they carry a generated class as scope. Making them `static` did not help. They now live in global functions.
+
+**Open for the author to review:** Retracting votes stays possible on finished requests, because rules 1 and 5 do not forbid it.

@@ -73,7 +73,7 @@
 | `votes.feature_request_id`    | cascade  | A vote has no meaning without its request.                                                   |
 | `votes.user_id`               | cascade  | Account deletion removes the person's votes.                                                 |
 
-**Known gap:** The cascade from `votes.user_id` removes vote rows without lowering `feature_requests.votes_count`. This has to be solved together with the vote actions in stage 3.
+The cascade from `votes.user_id` removes vote rows without lowering `feature_requests.votes_count`. The `DeleteUser` action corrects the counts, see decision 13.
 
 ## 10. Stored vote count
 
@@ -84,3 +84,35 @@
 ## 11. Rules the database cannot enforce
 
 The unique vote, valid statuses and non-negative counts are database constraints. "No vote for your own request", "no vote on finished requests" and the allowed status transitions compare several rows or the previous value, so they belong in the application layer in stage 3.
+
+## 12. Concurrency strategy for votes
+
+**Context:** Votes must stay correct under concurrent requests, and a vote must not slip in while an admin declines the request.
+
+**Decision:** `CastVote`, `RetractVote` and `ChangeStatus` lock the feature request row with `lockForUpdate` in a transaction and check the policy against the locked row. The count changes through an atomic `increment`.
+
+**Reason, measured by mutation:** With the lock removed, the tests for concurrent votes stayed green, because `increment` is atomic and `firstOrCreate` handles unique conflicts. Only replacing `increment` with read-modify-write as well lost an update (count 1 instead of 2). The lock protects something else: without it, a vote arriving during a decline was accepted. A dedicated test now covers that case.
+
+## 13. Account deletion through an action
+
+**Options:** A `DeleteUser` action, a PostgreSQL trigger on `votes`, or keeping votes anonymously with a nullable `user_id`.
+
+**Decision:** A `DeleteUser` action, used by the profile settings.
+
+**Reason:** It sits next to the other actions and is easy to read, test and change. A trigger would be more robust but hides logic in the database, and anonymous votes would weaken the unique rule.
+
+**Trade-off:** Code that deletes a user without this action, such as a direct `$user->delete()`, leaves the counts too high.
+
+## 14. Retracting votes on finished requests
+
+**Context:** Rule 1 says a vote can be retracted. Rule 5 only forbids voting on finished or declined requests.
+
+**Decision:** Retracting stays possible in every status.
+
+**Reason:** This follows the rules literally, and a person keeps control over their own vote. The count of a finished request can therefore still go down.
+
+## 15. Actions enforce the rules themselves
+
+**Decision:** Actions call `Gate::forUser()->authorize()` on the locked row instead of leaving authorization to controllers.
+
+**Reason:** The check must see the state inside the lock. A check in the controller would read the row earlier and could be outdated when the write happens.

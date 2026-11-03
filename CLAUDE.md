@@ -40,4 +40,5 @@ Each rule comes from a concrete case.
 - **`laravel/pao` changes tool arguments for AI agents.** `pest --drift` failed with an argument error because pao appends `--no-output` when it detects an agent. Set `PAO_DISABLE=1` when a tool needs its exact arguments or full output.
 - **Local green is not enough.** Eight tests passed locally but failed on a fresh clone because an old `public/build` hid a missing Vite manifest. Replay CI steps in a fresh clone when changing the toolchain.
 - **Check framework APIs before using them.** `Collection::getOrFail()` was used from memory in a seeder, and it does not exist. Look methods up in `vendor/`.
+- **Prove that a test can fail.** Concurrency tests stayed green with the row lock removed. Remove the protection temporarily and watch the test turn red before trusting it.
 - **Check the kit's `.gitignore`.** It ignored `CLAUDE.md`, which this project must commit.
