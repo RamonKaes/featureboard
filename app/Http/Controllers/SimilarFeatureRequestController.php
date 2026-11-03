@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SimilarFeatureRequestsRequest;
-use App\Http\Resources\SimilarFeatureRequestResource;
+use App\Http\Resources\FeatureRequestSummaryResource;
 use App\Models\Product;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -24,6 +24,6 @@ class SimilarFeatureRequestController extends Controller
             ->limit(self::LIMIT)
             ->get();
 
-        return SimilarFeatureRequestResource::collection($featureRequests);
+        return FeatureRequestSummaryResource::collection($featureRequests);
     }
 }

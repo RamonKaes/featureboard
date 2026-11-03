@@ -12,6 +12,16 @@ enum FeatureRequestStatus: string
     case Done = 'done';
     case Declined = 'declined';
 
+    /**
+     * The statuses shown on the public roadmap, in workflow order.
+     *
+     * @return list<self>
+     */
+    public static function onRoadmap(): array
+    {
+        return [self::Planned, self::InProgress, self::Done];
+    }
+
     public function label(): string
     {
         return match ($this) {

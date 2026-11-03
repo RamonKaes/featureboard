@@ -6,11 +6,13 @@ use App\Http\Controllers\FeatureRequestController;
 use App\Http\Controllers\FeatureRequestStatusController;
 use App\Http\Controllers\FeatureRequestVoteController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RoadmapController;
 use App\Http\Controllers\SimilarFeatureRequestController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('products/{product:slug}', [FeatureRequestController::class, 'index'])->name('products.show');
+Route::get('products/{product:slug}/roadmap', RoadmapController::class)->name('products.roadmap');
 
 Route::scopeBindings()->prefix('products/{product:slug}/requests')->name('feature-requests.')->group(function () {
     Route::middleware('auth')->group(function () {

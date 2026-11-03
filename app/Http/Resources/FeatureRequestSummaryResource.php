@@ -11,7 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @mixin FeatureRequest
  */
-class SimilarFeatureRequestResource extends JsonResource
+class FeatureRequestSummaryResource extends JsonResource
 {
     /**
      * @return array<string, mixed>
