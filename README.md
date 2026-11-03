@@ -85,6 +85,7 @@ I wrote a brief with nine stages and fixed rules, and Claude Code worked through
 - Its first concurrency tests stayed green with the row lock removed, because it had assumed the lock protected the vote count. A mutation check showed that the lock protects something else, and a new test now covers that.
 - Its first accessibility tests checked 404 pages, because they assumed database ids.
 - It once read a failing test as passing, because it had cut the result line from the output.
+- Anonymous requests like `?status[]=done` or `/requests/abc` ended in HTTP 500, after hundreds of green tests that only sent valid input. A guard that attacks every route with hostile input found these and more.
 
 Each lesson became a rule in `CLAUDE.md`, together with the case that caused it.
 
@@ -108,9 +109,9 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 
 | Check         | Result                                                                        |
 | ------------- | ----------------------------------------------------------------------------- |
-| Tests         | 250 tests with 862 assertions, against PostgreSQL                             |
+| Tests         | 275 tests with 960 assertions, against PostgreSQL                             |
 | Browser tests | 46 tests with 102 assertions                                                  |
-| Coverage      | 98.1% of lines in `app/`, without browser tests                               |
+| Coverage      | 98.2% of lines in `app/`, without browser tests                               |
 | Larastan      | Level 9, 0 errors, no baseline and no ignored errors                          |
 | Pint          | Laravel preset plus strict types and strict comparison                        |
 | Frontend      | Vite+ lint and format, `vue-tsc` without errors                               |
@@ -120,6 +121,7 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 | Query counts  | Constant per page, tested and protected by `preventLazyLoading`               |
 | Rate limits   | 30 votes and 60 searches per minute per user, tested                          |
 
+- **Hostile input:** A test takes every route from the router and sends arrays, NUL bytes, invalid UTF-8, overflowing ids and more in every known field and path parameter, as guest and as admin. None may end in a server error.
 - **Concurrency:** Separate processes vote at the same moment against committed rows. Removing the lock or the atomic increment makes these tests fail, which was checked by mutation.
 - **CI:** GitHub Actions runs Pint, Larastan, the frontend checks, the tests with a PostgreSQL service, the build and the browser tests.
 - **Limits of the tools:** axe missed two contrast failures that the calculation found, so green tools alone are not treated as proof.

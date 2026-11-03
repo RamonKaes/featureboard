@@ -211,3 +211,19 @@ The planner uses the GIN index when it helps. For very common words a sequential
 **Decision:** 30 votes and 60 searches per minute for each user.
 
 **Reason:** A person will not vote 30 times a minute. The search debounce allows at most about three requests per second while typing, but real typing has far fewer pauses, so 60 leaves room without allowing scraping. The numbers are estimates without real usage data.
+
+## 26. Malformed input
+
+**Context:** PostgreSQL throws on an id that is not a bigint and on text with NUL bytes or invalid UTF-8, where other databases are more forgiving. Requests with such values ended in HTTP 500, and no test with valid input could find that.
+
+**Decision:**
+
+- The `featureRequest` route parameter only accepts up to 18 digits, so the router answers everything else with a 404.
+- A global middleware answers NUL bytes, invalid UTF-8 and an array as email with a 400.
+- Identity validation rules use `bail`, so `current_password` never sees an array.
+- List filters read strings only, so an array falls back to the default like any other unknown value.
+- The routes of the removed password confirmation answer with a 404, because Fortify registers them anyway.
+
+**Reason:** Each fix sits at the cause. `tests/Feature/Security/InputShapeTest.php` reads the routes from the router, so a new route is attacked without anyone remembering to add it.
+
+**Trade-off:** The attack sends about 2,000 requests and takes about 50 seconds of the test run.

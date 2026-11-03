@@ -121,3 +121,17 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 - The first clone used the same folder name as the project, so it shared the Compose project and database volume with the development setup. Claude noticed before migrating and repeated the check with another name.
 
 **Corrected by the author:** Nothing in this stage.
+
+## After stage 8: Hostile input and the review prompt
+
+**Requested by the author:** A merciless review prompt, and a look at which test guards would help this project.
+
+**Found while measuring:** Claude tried the guard idea against the running app before recommending it, and anonymous requests ended in HTTP 500. The new guard then found more: array passwords and emails, and the routes of a removed feature.
+
+**AI mistakes:**
+
+- All tests sent valid input for seven stages, and the audit in `docs/QUALITY.md` did not ask for anything else.
+- Its first probe script rolled back its own test data, so its 404 results meant nothing. Claude discarded them and measured again.
+- The new guard stopped seeing `sort` after the fix changed how the name was read. Its own coverage test caught that.
+
+**Decided by the author:** Fix the errors first, review afterwards in a fresh session, and invite reviewers only after reading the code.

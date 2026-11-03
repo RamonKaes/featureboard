@@ -49,4 +49,5 @@ Each rule comes from a concrete case.
 - **Never assume database ids in tests.** Sequences survive rolled back tests. Accessibility checks on `/requests/1` tested a 404 page and passed. Look ids up and assert the page content first.
 - **Read the full test result.** A failing test looked green because the result line was cut from the output. Check the exit code.
 - **A green tool is not proof.** axe missed two contrast failures, one in `aria-hidden` text and one on input borders. Calculate what the tool does not cover.
+- **Test hostile input, not only valid input.** `?status[]=done` answered visitors with HTTP 500 after hundreds of green tests. Read the routes from the router, so that new ones are attacked too.
 - **Check the kit's `.gitignore`.** It ignored `CLAUDE.md`, which this project must commit.
