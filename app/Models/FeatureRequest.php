@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\FeatureRequestSort;
 use App\Enums\FeatureRequestStatus;
 use Database\Factories\FeatureRequestFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -51,6 +53,24 @@ class FeatureRequest extends Model
             'status' => FeatureRequestStatus::class,
             'votes_count' => 'integer',
         ];
+    }
+
+    /**
+     * Add a has_voted attribute that tells whether the given user has voted.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeWithVoteOf(Builder $query, ?User $user): void
+    {
+        $query->withExists(['votes as has_voted' => fn (Builder $votes) => $votes->where('user_id', $user?->id)]);
+    }
+
+    /**
+     * @param  Builder<self>  $query
+     */
+    public function scopeSortedBy(Builder $query, FeatureRequestSort $sort): void
+    {
+        $query->orderByDesc($sort->column())->orderByDesc('id');
     }
 
     /**

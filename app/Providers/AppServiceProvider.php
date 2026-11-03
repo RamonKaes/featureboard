@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -41,6 +42,8 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Model::preventLazyLoading(! app()->isProduction());
+
+        JsonResource::withoutWrapping();
 
         Password::defaults(fn (): ?Password => app()->isProduction()
             ? Password::min(12)

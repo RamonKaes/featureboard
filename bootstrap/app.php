@@ -9,6 +9,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -29,4 +31,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // Inertia would show a 403 in a modal, so visits from the interface get a toast instead.
+        $exceptions->respond(function (Response $response, Throwable $e, Request $request) {
+            if ($response->getStatusCode() !== 403 || ! $request->inertia()) {
+                return $response;
+            }
+
+            Inertia::flash('toast', ['type' => 'error', 'message' => 'Diese Aktion ist nicht erlaubt.']);
+
+            return back();
+        });
     })->create();

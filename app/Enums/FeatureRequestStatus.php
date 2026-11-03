@@ -12,6 +12,17 @@ enum FeatureRequestStatus: string
     case Done = 'done';
     case Declined = 'declined';
 
+    public function label(): string
+    {
+        return match ($this) {
+            self::New => 'Neu',
+            self::Planned => 'Geplant',
+            self::InProgress => 'In Arbeit',
+            self::Done => 'Erledigt',
+            self::Declined => 'Abgelehnt',
+        };
+    }
+
     /**
      * The statuses this status may change to. This is the single source of truth for the workflow.
      *
