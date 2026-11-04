@@ -84,14 +84,16 @@ test('a page change moves the focus to the new content', function () {
     expect($page->script('document.activeElement.id'))->toBe('main-content');
 });
 
-test('voting keeps the focus on the button', function () {
+test('voting keeps the focus on the button after the response has arrived', function () {
     $this->actingAs(User::query()->where('email', 'demo@featureboard.test')->sole());
 
     $selector = "button[aria-label^='Für „Warteliste']";
     $page = visit('/products/terminzeit')->assertSee('Warteliste')->click($selector)
-        ->assertAttribute($selector, 'aria-pressed', 'true');
+        ->assertAttribute($selector, 'aria-pressed', 'true')
+        ->wait(1);
 
-    expect($page->script('document.activeElement.getAttribute("aria-pressed")'))->toBe('true');
+    expect($page->script('document.activeElement.getAttribute("aria-label")'))->toStartWith('Für „Warteliste')
+        ->and($page->script('document.activeElement.getAttribute("aria-busy")'))->toBe('false');
 });
 
 test('a status change keeps the focus in the status area', function () {
@@ -157,3 +159,66 @@ test('an edit keeps a changed description when the title changes too', function 
     expect($featureRequest->fresh()?->description)->toBe('Komplett neu geschriebene Beschreibung')
         ->and($featureRequest->fresh()?->title)->toBe('Wiederkehrende Rechnungen versenden');
 });
+
+function assertFocusOnInvalidField(mixed $page, string $field, string $message): void
+{
+    $page->assertSee($message)->wait(0.3);
+
+    expect($page->script('document.activeElement.id'))->toBe($field)
+        ->and($page->script('document.activeElement.getAttribute("aria-invalid")'))->toBe('true')
+        ->and($page->script('document.getElementById(document.activeElement.getAttribute("aria-describedby"))?.textContent'))->toContain($message);
+}
+
+test('a failed login moves the focus to the field and explains the error', function () {
+    $page = visit('/login')
+        ->fill('email', 'nobody@example.com')
+        ->fill('password', 'wrong-password')
+        ->press('Anmelden');
+
+    assertFocusOnInvalidField($page, 'email', 'Diese Zugangsdaten sind nicht korrekt.');
+});
+
+test('a failed registration moves the focus to the first invalid field', function () {
+    $page = visit('/register')
+        ->fill('name', 'Someone')
+        ->fill('email', 'demo@featureboard.test')
+        ->fill('password', 'a-long-password')
+        ->fill('password_confirmation', 'a-long-password')
+        ->click('button[type=submit]');
+
+    assertFocusOnInvalidField($page, 'email', 'E-Mail ist bereits vergeben.');
+});
+
+test('a failed reset request moves the focus to the field', function () {
+    $page = visit('/forgot-password')
+        ->fill('email', 'nobody@example.com')
+        ->press('Link zum Zurücksetzen senden');
+
+    assertFocusOnInvalidField($page, 'email', 'Wir konnten keinen Account');
+});
+
+test('a failed password reset moves the focus to the field with the error', function () {
+    $page = visit('/reset-password/some-token?email=demo@featureboard.test')
+        ->fill('password', 'a-long-password')
+        ->fill('password_confirmation', 'another-password')
+        ->click('button[type=submit]');
+
+    assertFocusOnInvalidField($page, 'email', 'Dieser Link zum Zurücksetzen ist ungültig.');
+});
+
+test('very long words do not overflow any page', function (int $width) {
+    $author = User::factory()->create(['name' => str_repeat('n', 255)]);
+    $product = Product::query()->where('slug', 'terminzeit')->sole();
+    $featureRequest = FeatureRequest::factory()->for($product)->for($author, 'author')->create([
+        'title' => str_repeat('t', 120),
+        'description' => str_repeat('d', 2000),
+        'status' => FeatureRequestStatus::Planned,
+        'votes_count' => 99,
+    ]);
+
+    foreach (['/products/terminzeit', "/products/terminzeit/requests/{$featureRequest->id}", '/products/terminzeit/roadmap'] as $path) {
+        $page = visit($path)->resize($width, 800)->assertSee('Terminzeit');
+
+        expect($page->script('document.documentElement.scrollWidth - document.documentElement.clientWidth'))->toBe(0, $path);
+    }
+})->with([320, 1280]);

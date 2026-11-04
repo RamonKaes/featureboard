@@ -35,6 +35,9 @@ function assertAccessible(string $path, string $heading, bool $darkMode): void
 
     // The heading proves that the intended page was checked rather than an error page.
     $page->assertSee($heading)->assertNoAccessibilityIssues(3);
+
+    expect($page->script('document.querySelectorAll("h1").length'))->toBe(1)
+        ->and($page->script('document.documentElement.lang'))->toBe('de');
 }
 
 dataset('color schemes', ['light' => false, 'dark' => true]);
@@ -84,3 +87,7 @@ test('form errors have no accessibility issues', function () {
         ->assertSee('Titel muss mindestens 5 Zeichen lang sein.')
         ->assertNoAccessibilityIssues(3);
 });
+
+test('the error page has no accessibility issues', function (bool $darkMode) {
+    assertAccessible('/products/unknown', 'Seite nicht gefunden', $darkMode);
+})->with('color schemes');
