@@ -21,6 +21,10 @@ class DeleteUser
 
             $votedFor = $user->votes()->pluck('feature_request_id');
 
+            // Sessions and reset tokens have no foreign key, but they hold personal data.
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+            DB::table('password_reset_tokens')->where('email', $user->email)->delete();
+
             $user->delete();
 
             FeatureRequest::withoutTimestamps(

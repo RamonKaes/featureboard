@@ -26,7 +26,7 @@ const passwordInput = useTemplateRef('passwordInput');
         <Heading
             variant="small"
             title="Konto löschen"
-            description="Lösche dein Konto und alle zugehörigen Daten"
+            description="Lösche dein Konto und deine Stimmen. Deine Wünsche bleiben ohne deinen Namen erhalten."
         />
         <div
             class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10"
@@ -58,8 +58,10 @@ const passwordInput = useTemplateRef('passwordInput');
                                 löschen?</DialogTitle
                             >
                             <DialogDescription>
-                                Dabei werden auch deine Daten endgültig
-                                gelöscht. Gib zur Bestätigung dein Passwort ein.
+                                Dein Konto und deine Stimmen werden endgültig
+                                gelöscht. Deine Wünsche bleiben ohne deinen
+                                Namen öffentlich. Gib zur Bestätigung dein
+                                Passwort ein.
                             </DialogDescription>
                         </DialogHeader>
 
