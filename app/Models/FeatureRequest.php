@@ -42,7 +42,7 @@ class FeatureRequest extends Model
      * @var array<string, mixed>
      */
     protected $attributes = [
-        'status' => 'new',
+        'status' => FeatureRequestStatus::New->value,
         'votes_count' => 0,
     ];
 
