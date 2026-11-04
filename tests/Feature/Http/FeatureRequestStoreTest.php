@@ -87,5 +87,25 @@ test('invalid input is rejected with German messages', function (array $input, s
     'long title' => [['title' => str_repeat('a', 121)], 'title', 'Titel darf höchstens 120 Zeichen lang sein.'],
     'missing description' => [['description' => ''], 'description', 'Bitte gib Beschreibung an.'],
     'short description' => [['description' => 'Zu kurz'], 'description', 'Beschreibung muss mindestens 10 Zeichen lang sein.'],
+    'invisible tag characters' => [['title' => str_repeat("\u{E0041}", 5)], 'title', 'Titel muss mindestens 3 Buchstaben oder Ziffern enthalten.'],
+    'only punctuation' => [['title' => '!!!!!'], 'title', 'Titel muss mindestens 3 Buchstaben oder Ziffern enthalten.'],
+    'only emoji' => [['title' => '🚀🚀🚀🚀🚀'], 'title', 'Titel muss mindestens 3 Buchstaben oder Ziffern enthalten.'],
+    'right-to-left override' => [['title' => "Erledigt \u{202E}tgilredE"], 'title', 'Titel darf keine Steuerzeichen für die Schreibrichtung enthalten.'],
     'long description' => [['description' => str_repeat('a', 5001)], 'description', 'Beschreibung darf höchstens 5000 Zeichen lang sein.'],
+]);
+
+test('titles in any script with punctuation and emoji are accepted', function (string $title) {
+    $this->actingAs(User::factory()->create())
+        ->post(route('feature-requests.store', Product::factory()->create()), [
+            'title' => $title,
+            'description' => 'Eine gültige Beschreibung.',
+        ])
+        ->assertSessionHasNoErrors();
+
+    expect(FeatureRequest::query()->sole()->title)->toBe($title);
+})->with([
+    'umlauts' => ['Größenänderung'],
+    'three digits around emoji' => ['🚀 1 2 3 🚀'],
+    'arabic without controls' => ['تصدير الفواتير'],
+    'family emoji with joiners' => ['Export 👨‍👩‍👧 für Familien'],
 ]);
