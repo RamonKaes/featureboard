@@ -34,6 +34,20 @@ test('password can be updated', function () {
     expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue();
 });
 
+test('the new password must be confirmed', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->put(route('user-password.update'), [
+            'current_password' => 'password',
+            'password' => 'new-password',
+            'password_confirmation' => 'other-password',
+        ])
+        ->assertSessionHasErrors('password');
+
+    expect(Hash::check('password', $user->refresh()->password))->toBeTrue();
+});
+
 test('correct password must be provided to update password', function () {
     $user = User::factory()->create();
 

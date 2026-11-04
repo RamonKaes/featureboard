@@ -206,11 +206,11 @@ test('an unknown appearance falls back to the system setting', function (mixed $
         ->assertSee("const appearance = 'system';", false);
 })->with([['x'], ['nonsense'], ['\\'], ["'"]]);
 
-test('a valid appearance is still used', function () {
-    $this->call('GET', '/', [], ['appearance' => 'dark'])
+test('a valid appearance is still used', function (string $appearance) {
+    $this->call('GET', '/', [], ['appearance' => $appearance])
         ->assertOk()
-        ->assertSee("const appearance = 'dark';", false);
-});
+        ->assertSee("const appearance = '{$appearance}';", false);
+})->with(['light', 'dark', 'system']);
 
 test('a page number that cannot exist shows the first page', function (string $page) {
     $this->get("/products/{$this->product->slug}?page={$page}")

@@ -100,6 +100,21 @@ test('the list is paginated and keeps the filters in its links', function () {
             ->where('featureRequests.links.prev', fn (string $link) => str_contains($link, 'status=planned')));
 });
 
+test('each entry carries what the card shows, and guests may do nothing', function () {
+    $product = Product::factory()->create();
+    $featureRequest = FeatureRequest::factory()->for($product)->create(['votes_count' => 7, 'created_at' => '2026-01-02 03:04:05']);
+
+    $this->get(route('products.show', $product))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('featureRequests.data.0.id', $featureRequest->id)
+            ->where('featureRequests.data.0.votesCount', 7)
+            ->where('featureRequests.data.0.acceptsVotes', true)
+            ->where('featureRequests.data.0.createdAt', '2026-01-02T03:04:05+00:00')
+            ->where('featureRequests.data.0.hasVoted', false)
+            ->where('featureRequests.data.0.can.vote', false)
+            ->where('featureRequests.data.0.can.update', false));
+});
+
 test('logged in users see their own vote and permissions', function () {
     $user = User::factory()->create();
     $product = Product::factory()->create();

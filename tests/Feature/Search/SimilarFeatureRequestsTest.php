@@ -40,6 +40,17 @@ test('it finds other word forms and spellings', function (string $stored, string
     'upper and lower case' => ['Export als PDF', 'EXPORT'],
 ]);
 
+test('only the last word can be unfinished, from three letters on', function (string $typed, bool $found) {
+    FeatureRequest::factory()->for($this->product)->create(['title' => 'Warteliste für Termine', 'description' => 'Ohne Bezug.']);
+
+    expect(findSimilar($this->product, $typed))->toHaveCount($found ? 1 : 0);
+})->with([
+    'last word after a complete one' => ['Mahnung Wartel', true],
+    'unfinished word that is not the last' => ['Wartel Mahnung', false],
+    'exactly three letters' => ['Ter', true],
+    'two letters' => ['Te', false],
+]);
+
 test('it needs only one matching word', function () {
     FeatureRequest::factory()->for($this->product)->create(['title' => 'Mahnungen erstellen', 'description' => 'Ohne Bezug.']);
 

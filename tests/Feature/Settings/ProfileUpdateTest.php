@@ -114,3 +114,17 @@ test('an address differing only in case counts as taken', function () {
 
     expect($user->fresh()?->email)->not->toBe('taken@example.com');
 });
+
+test('name and email are limited to what the database column promises', function (string $field, string $value, bool $allowed) {
+    $user = User::factory()->create();
+    $input = ['name' => 'Someone', 'email' => 'someone@example.com', $field => $value];
+
+    $response = $this->actingAs($user)->patch(route('profile.update'), $input);
+
+    $allowed ? $response->assertSessionHasNoErrors() : $response->assertSessionHasErrors($field);
+})->with([
+    '255 character name' => ['name', str_repeat('a', 255), true],
+    '256 character name' => ['name', str_repeat('a', 256), false],
+    '255 character email' => ['email', str_repeat('a', 243).'@example.com', true],
+    '256 character email' => ['email', str_repeat('a', 244).'@example.com', false],
+]);

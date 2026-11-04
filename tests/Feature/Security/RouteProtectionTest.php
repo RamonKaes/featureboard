@@ -82,9 +82,14 @@ test('the admin flag cannot be set through the profile form', function () {
 });
 
 test('the shared user data contains no secrets', function () {
-    $this->actingAs(User::factory()->create())
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
         ->get(route('home'))
         ->assertInertia(fn (Assert $page) => $page
+            ->where('name', config('app.name'))
+            ->where('auth.user.id', $user->id)
+            ->where('auth.user.name', $user->name)
             ->missing('auth.user.password')
             ->missing('auth.user.remember_token'));
 });
