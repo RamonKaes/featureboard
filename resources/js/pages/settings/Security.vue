@@ -6,6 +6,7 @@ import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { focusFirstError } from '@/lib/focusFirstError';
 import { edit } from '@/routes/security';
 
 // oxfmt-ignore
@@ -50,6 +51,7 @@ defineOptions({
             ]"
             class="space-y-6"
             v-slot="{ errors, processing }"
+            @error="focusFirstError"
         >
             <div class="grid gap-2">
                 <Label for="current_password">Aktuelles Passwort</Label>
