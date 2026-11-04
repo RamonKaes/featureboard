@@ -237,3 +237,11 @@ The planner uses the GIN index when it helps. For very common words a sequential
 **Decision:** Rate limits for submitting and registering, and a test that every writing route has a limit or a stated exemption. A moderation feature and email verification stay out, and the README names both as limitations.
 
 **Reason:** The limits are small and solve the worst case. Moderation is a feature of its own, and verification was removed on purpose in decision 3, so both are the author's call.
+
+## 28. The idea
+
+**Decision:** A feature request board. Claude Code suggested it, and the author kept it.
+
+**Reason:** Every product team knows the problem, it runs without API keys or outside services, and its tests are deterministic. It is small but has real rules: a fixed workflow, one vote per account under concurrency, and a search that stops duplicates before they exist.
+
+**Trade-off:** It is a common type of demo. The voting hint in the form is what sets it apart.

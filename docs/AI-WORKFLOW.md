@@ -149,3 +149,18 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 **Second round:** The desktop session ended during a browser test run, and the cause could not be found in the logs available to Claude. Nothing was lost. Claude's assumption that `preserveState` keeps the focus after a vote was wrong: the test stayed red, and the card moving in the sorted list was the likely reason. A global `4xx` error view did not apply either, because the framework's own views for single statuses win.
 
 **Third round, requested by the author:** Fix what remains without overcoding, and put the rest in a ledger. Claude fixed most medium findings and two low ones, and listed the others with a reason and a condition for reconsidering them in `docs/REVIEW-LEDGER.md`. Whether each of those reasons is good enough is the author's call.
+
+## After stage 8: Second big review
+
+**Asked for:** A second review on a different model than the one that wrote the code, and fixes without overcoding.
+
+**Proposed and built:** Claude Fable 5.1 reported 0 blockers, 1 high, 4 medium and 10 low findings. Claude Opus 5.5 reproduced the worst ones and fixed the high finding, the medium findings and four low findings. The author then asked for a vote button in the similar requests hint, a manual portability workflow and Laravel Boost started through Sail.
+
+**Corrected:**
+
+- The review's fix for the last admin rule used `lockForUpdate()->count()`, which PostgreSQL refuses.
+- The review's login timing leak did not show on an idle server, because Laravel's 200 ms minimum hides it. It appears under load.
+- Claude started the review session on the default model and claimed that this could not be changed. The author insisted, and the model was then set and read back.
+- `sail exec` runs as root and left root-owned files, which made a build fail. A cut output line hid that failure, and a commit went in before the result was read.
+- A `git checkout` during a mutation check reverted uncommitted work, which then had to be applied again.
+- `.mcp.json` was in the kit's `.gitignore`, so a commit first lacked the file it named.
