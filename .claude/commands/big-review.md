@@ -179,10 +179,10 @@ Ask of every finding from reading: **which machine should have caught this, and 
 - Comments that repeat the code or contradict it, checked for at least ten at random.
 - Git history: secrets, commit quality, huge files, messages that do not match their diff.
 
-**Interview readiness**
+**Explaining the code**
 
 - Would a senior Laravel developer approve each file in a pull request? What is over-engineered, what is clever without need, what is not idiomatic?
-- For the ten central files, write the hardest question an interviewer would ask, and whether the code has a good answer. Name the three spots most likely to be hit by a live change request and what would make that change hard.
+- For the ten central files, write the hardest question an experienced reader would ask, and whether the code has a good answer. Name the three spots most likely to be hit by a live change request and what would make that change hard.
 
 **Pre-launch areas that apply to this demo**
 
@@ -225,7 +225,7 @@ Freeze your Phase A list first. After that you may add findings but never shorte
 | MEDIUM  | Real defect without acute damage: edge case, accessibility failure with user impact, missing test for a rule      |
 | LOW     | Small, real and cheap. Tag `Quick-Win` or `Overcoding` with one line of reason                                    |
 
-Rate from the reader's view: something an interviewer can trigger in five minutes ranks higher than a theoretical issue of the same technical weight. Never raise a level to get attention.
+Rate from the reader's view: something a reader can trigger in five minutes ranks higher than a theoretical issue of the same technical weight. Never raise a level to get attention.
 
 **Save the report** as `docs/reviews/<date>-<commit>.md`, untracked, for the author to decide about, and print the summary in the conversation:
 
@@ -235,7 +235,7 @@ Rate from the reader's view: something an interviewer can trigger in five minute
 - **D. Surviving mutants** and uncovered lines, each with its decision.
 - **E. False claims:** every README or docs sentence that did not hold.
 - **F. Missing machines:** which automated guard would have caught each finding, ranked by value. Do not add one that merely repeats a tool.
-- **G. Interview risk:** the hardest questions and the three likeliest live changes.
+- **G. Explanation risk:** the hardest questions and the three likeliest live changes.
 - **H. Not checked:** everything you did not measure, and why. This section is mandatory, and it is never empty.
 - **I. LOW for triage:** at most ten, each with its tag.
 

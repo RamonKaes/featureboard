@@ -1,6 +1,6 @@
 # Featureboard
 
-Ein Board für Produktwünsche mit öffentlicher Roadmap, gebaut mit Laravel, Inertia, Vue und PostgreSQL. Es ist meine Arbeitsprobe für eine Stelle als Laravel-Entwickler. Diese Datei erzählt das ganze Projekt auf Deutsch und in einem Stück: was die Anwendung kann, warum sie so gebaut ist, wie sie geprüft wurde, welche Rolle die KI dabei hatte und was bewusst offen bleibt.
+Ein Board für Produktwünsche mit öffentlicher Roadmap, gebaut mit Laravel, Inertia, Vue und PostgreSQL. Diese Datei erzählt das ganze Projekt auf Deutsch und in einem Stück: was die Anwendung kann, warum sie so gebaut ist, wie sie geprüft wurde, welche Rolle die KI dabei hatte und was bewusst offen bleibt.
 
 ![Wünsche eines Produkts](docs/screenshots/requests.png)
 

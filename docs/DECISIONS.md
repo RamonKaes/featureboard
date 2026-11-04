@@ -2,7 +2,7 @@
 
 ## 1. Stack
 
-**Context:** The app is an application demo for Laravel developers. It needs a modern, idiomatic stack and PostgreSQL full-text search later on.
+**Context:** The app is a demo that Laravel developers will read. It needs a modern, idiomatic stack and PostgreSQL full-text search later on.
 
 **Decision:** Laravel 13, Inertia 3, Vue 3 with TypeScript, Tailwind 4 and PostgreSQL 18 on Laravel Sail with PHP 8.5, based on the official `laravel/vue-starter-kit`.
 

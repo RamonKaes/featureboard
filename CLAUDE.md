@@ -1,6 +1,6 @@
 # Featureboard: working rules
 
-Feature request and roadmap board, built as a job application demo. Experienced Laravel developers will read this code, and the author must explain and change it live.
+Feature request and roadmap board, built as a demo. Experienced Laravel developers will read this code, and the author must be able to explain and change it.
 
 Talk to the author in German. Code, comments, commit messages and the README are in English.
 
