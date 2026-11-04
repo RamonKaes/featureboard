@@ -11,6 +11,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
+import { focusFirstError } from '@/lib/focusFirstError';
 
 defineOptions({
     layout: {
@@ -39,6 +40,7 @@ defineProps<{
         v-bind="store.form()"
         :reset-on-success="['password']"
         v-slot="{ errors, processing }"
+        @error="focusFirstError"
         class="flex flex-col gap-6"
     >
         <div class="grid gap-6">
@@ -46,6 +48,8 @@ defineProps<{
                 <Label for="email">E-Mail-Adresse</Label>
                 <Input
                     id="email"
+                    :aria-invalid="errors.email ? true : undefined"
+                    aria-describedby="email-error"
                     type="email"
                     name="email"
                     required
@@ -53,7 +57,7 @@ defineProps<{
                     autocomplete="email"
                     placeholder="email@example.com"
                 />
-                <InputError :message="errors.email" />
+                <InputError id="email-error" :message="errors.email" />
             </div>
 
             <div class="grid gap-2">
@@ -69,12 +73,14 @@ defineProps<{
                 </div>
                 <PasswordInput
                     id="password"
+                    :aria-invalid="errors.password ? true : undefined"
+                    aria-describedby="password-error"
                     name="password"
                     required
                     autocomplete="current-password"
                     placeholder="Passwort"
                 />
-                <InputError :message="errors.password" />
+                <InputError id="password-error" :message="errors.password" />
             </div>
 
             <div class="flex items-center justify-between">

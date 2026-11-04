@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { Form, Link } from '@inertiajs/vue3';
 import type { InertiaLinkProps } from '@inertiajs/vue3';
-import { nextTick, ref } from 'vue';
+import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import SimilarFeatureRequests from '@/components/SimilarFeatureRequests.vue';
+import { focusFirstError } from '@/lib/focusFirstError';
 import type { Product } from '@/types';
 
 const props = defineProps<{
@@ -22,11 +23,6 @@ const props = defineProps<{
 
 const titleInput = ref(props.title ?? '');
 const descriptionInput = ref(props.description ?? '');
-
-async function focusFirstError(): Promise<void> {
-    await nextTick();
-    document.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
-}
 </script>
 
 <template>

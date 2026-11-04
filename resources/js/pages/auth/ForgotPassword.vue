@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
+import { focusFirstError } from '@/lib/focusFirstError';
 
 defineOptions({
     layout: {
@@ -33,18 +34,24 @@ defineProps<{
     </div>
 
     <div class="space-y-6">
-        <Form v-bind="email.form()" v-slot="{ errors, processing }">
+        <Form
+            v-bind="email.form()"
+            v-slot="{ errors, processing }"
+            @error="focusFirstError"
+        >
             <div class="grid gap-2">
                 <Label for="email">E-Mail-Adresse</Label>
                 <Input
                     id="email"
+                    :aria-invalid="errors.email ? true : undefined"
+                    aria-describedby="email-error"
                     type="email"
                     name="email"
                     autocomplete="off"
                     v-focus
                     placeholder="email@example.com"
                 />
-                <InputError :message="errors.email" />
+                <InputError id="email-error" :message="errors.email" />
             </div>
 
             <div class="my-6 flex items-center justify-start">

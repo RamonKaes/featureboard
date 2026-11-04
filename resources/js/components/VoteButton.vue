@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { ChevronUp } from '@lucide/vue';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, useTemplateRef } from 'vue';
 import { toast } from 'vue-sonner';
 import {
     destroy,
@@ -17,6 +17,7 @@ const props = defineProps<{
 
 const page = usePage();
 const isSubmitting = ref(false);
+const button = useTemplateRef<HTMLButtonElement>('button');
 
 const canToggle = computed(
     () => props.featureRequest.can.vote || props.featureRequest.hasVoted,
@@ -52,6 +53,15 @@ function showFailure(): boolean {
     return false;
 }
 
+// A vote can move the card in the sorted list, and moving an element in the DOM drops its focus.
+async function restoreFocus(): Promise<void> {
+    await nextTick();
+
+    if (document.activeElement === document.body) {
+        button.value?.focus({ preventScroll: true });
+    }
+}
+
 function toggleVote(): void {
     if (isSubmitting.value) {
         return;
@@ -61,6 +71,7 @@ function toggleVote(): void {
 
     router.visit(action(props.featureRequest.id), {
         preserveScroll: true,
+        preserveState: true,
         // Inertia restores the previous props by itself when the visit fails.
         optimistic: ({ featureRequest, featureRequests }) => {
             const list = featureRequests as
@@ -86,7 +97,10 @@ function toggleVote(): void {
             };
         },
         onStart: () => (isSubmitting.value = true),
-        onFinish: () => (isSubmitting.value = false),
+        onFinish: () => {
+            isSubmitting.value = false;
+            void restoreFocus();
+        },
         onHttpException: showFailure,
         onNetworkError: showFailure,
     });
@@ -96,6 +110,7 @@ function toggleVote(): void {
 <template>
     <button
         v-if="canToggle"
+        ref="button"
         type="button"
         :aria-pressed="featureRequest.hasVoted"
         :aria-busy="isSubmitting"

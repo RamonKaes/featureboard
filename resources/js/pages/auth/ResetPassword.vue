@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { update } from '@/routes/password';
+import { focusFirstError } from '@/lib/focusFirstError';
 
 defineOptions({
     layout: {
@@ -33,12 +34,15 @@ const inputEmail = ref(props.email);
         :transform="(data) => ({ ...data, token, email })"
         :reset-on-success="['password', 'password_confirmation']"
         v-slot="{ errors, processing }"
+        @error="focusFirstError"
     >
         <div class="grid gap-6">
             <div class="grid gap-2">
                 <Label for="email">E-Mail-Adresse</Label>
                 <Input
                     id="email"
+                    :aria-invalid="errors.email ? true : undefined"
+                    aria-describedby="email-error"
                     type="email"
                     name="email"
                     autocomplete="email"
@@ -46,13 +50,19 @@ const inputEmail = ref(props.email);
                     class="mt-1 block w-full"
                     readonly
                 />
-                <InputError :message="errors.email" class="mt-2" />
+                <InputError
+                    id="email-error"
+                    :message="errors.email"
+                    class="mt-2"
+                />
             </div>
 
             <div class="grid gap-2">
                 <Label for="password">Passwort</Label>
                 <PasswordInput
                     id="password"
+                    :aria-invalid="errors.password ? true : undefined"
+                    aria-describedby="password-error"
                     name="password"
                     autocomplete="new-password"
                     class="mt-1 block w-full"
@@ -60,20 +70,27 @@ const inputEmail = ref(props.email);
                     placeholder="Passwort"
                     :passwordrules="passwordRules"
                 />
-                <InputError :message="errors.password" />
+                <InputError id="password-error" :message="errors.password" />
             </div>
 
             <div class="grid gap-2">
                 <Label for="password_confirmation">Passwort bestätigen</Label>
                 <PasswordInput
                     id="password_confirmation"
+                    :aria-invalid="
+                        errors.password_confirmation ? true : undefined
+                    "
+                    aria-describedby="password_confirmation-error"
                     name="password_confirmation"
                     autocomplete="new-password"
                     class="mt-1 block w-full"
                     placeholder="Passwort bestätigen"
                     :passwordrules="passwordRules"
                 />
-                <InputError :message="errors.password_confirmation" />
+                <InputError
+                    id="password_confirmation-error"
+                    :message="errors.password_confirmation"
+                />
             </div>
 
             <Button
