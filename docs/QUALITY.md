@@ -53,18 +53,18 @@ Results of the audit in stage 7, measured on 2026-11-03. Target: WCAG 2.2 AA.
 
 ## Security
 
-| Area            | Result                                                                                                                                                    |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Mass assignment | `is_admin`, `status`, `votes_count`, `user_id` and `product_id` are not fillable. Tested through registration and forms.                                  |
-| Authorization   | A test fails when a route is neither on the public list nor behind `auth`. Policies are checked in routes and actions.                                    |
-| Rate limiting   | Per minute and user: 30 votes, 60 searches, 10 submissions. 10 registrations per hour and address. Tested. Login uses Fortify's limit of 5 per minute.    |
-| XSS             | No `v-html` or unescaped Blade output in the app's own code. A browser test confirms that HTML in user text does not run.                                 |
-| Hostile input   | Every route, field and path parameter is attacked with arrays, NUL bytes, invalid UTF-8 and overflowing ids, as guest and as admin, with no server error. |
-| SQL injection   | Search input reduced to letters and digits and passed as a binding, tested with injection strings.                                                        |
-| Data exposure   | Resources list their fields explicitly, tested that other users' email addresses do not appear.                                                           |
-| Dependencies    | `composer audit` and `npm audit` report no known vulnerabilities.                                                                                         |
+| Area            | Result                                                                                                                                                                            |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Mass assignment | `is_admin`, `status`, `votes_count`, `user_id` and `product_id` are not fillable. Tested through registration and forms.                                                          |
+| Authorization   | A test fails when a route is neither on the public list nor behind `auth`. Policies are checked in routes and actions.                                                            |
+| Rate limiting   | Per minute and user: 30 votes, 60 searches, 10 submissions. Per address: 10 registrations an hour, 6 reset requests a minute. Tested. Login uses Fortify's limit of 5 per minute. |
+| XSS             | No `v-html` or unescaped Blade output in the app's own code. A browser test confirms that HTML in user text does not run.                                                         |
+| Hostile input   | Every route, field and path parameter is attacked with arrays, NUL bytes, invalid UTF-8 and overflowing ids, as guest and as admin, with no server error.                         |
+| SQL injection   | Search input reduced to letters and digits and passed as a binding, tested with injection strings.                                                                                |
+| Data exposure   | Resources list their fields explicitly, tested that other users' email addresses do not appear.                                                                                   |
+| Dependencies    | `composer audit` and `npm audit` report no known vulnerabilities.                                                                                                                 |
 
-**Not covered:** Security headers such as a Content Security Policy, and production hardening. The seeder creates accounts with a known password and is meant for local use only.
+**Not covered:** A Content Security Policy, and production hardening. The seeder creates accounts with a known password and is meant for local use only.
 
 ## Static analysis
 
@@ -95,4 +95,17 @@ A second round fixed six medium findings, also test first:
 | A test could not notice a reset that saves nothing       | The test logs in with the new password and fails with the old one         |
 | English error pages without a way back                   | German pages for every status                                             |
 
-The other medium and low findings stay open, and moderation stays a documented limitation.
+A third round fixed the rest that had a real benefit, and `docs/REVIEW-LEDGER.md` lists what was deliberately left, with reasons:
+
+| Finding                                          | Fix                                                                |
+| ------------------------------------------------ | ------------------------------------------------------------------ |
+| No limit on reset requests                       | 6 per minute and address on both routes                            |
+| Sessions survived a password change              | `authenticateSessions()` ends them                                 |
+| Deletion text promised too much, and data stayed | Text corrected, sessions and reset tokens removed                  |
+| The last admin could delete the account          | Refused with a validation error                                    |
+| Bcrypt cut off long passwords silently           | More than 72 bytes are refused                                     |
+| Missing security headers                         | `SecurityHeaders` middleware, globally. No Content Security Policy |
+| Appearance choice did not announce its state     | `aria-pressed`                                                     |
+| Pages behind the end showed contradicting text   | 404                                                                |
+
+Moderation stays a documented limitation.

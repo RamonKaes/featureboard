@@ -109,24 +109,24 @@ The full reasoning, with options and measurements, is in [docs/DECISIONS.md](doc
 
 All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.md) for the audit.
 
-| Check         | Result                                                                                                                    |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Tests         | 306 tests with 1,122 assertions, against PostgreSQL                                                                       |
-| Browser tests | 87 tests with 287 assertions                                                                                              |
-| Coverage      | 98.2% of lines in `app/`, without browser tests                                                                           |
-| Larastan      | Level 9, 0 errors, no baseline and no ignored errors                                                                      |
-| Pint          | Laravel preset plus strict types and strict comparison                                                                    |
-| Frontend      | Vite+ lint and format, `vue-tsc` without errors                                                                           |
-| Accessibility | axe at its strictest level on all pages with a route, light and dark, 0 issues                                            |
-| Contrast      | Tested on every visible text node in both themes, including states after an action: at least 4.5:1, or 3:1 for large text |
-| Index use     | `EXPLAIN ANALYZE` on 100,020 rows: 1.9 ms with the GIN index, 18.2 ms without                                             |
-| Query counts  | Constant on product list, request list, detail page and roadmap, tested. `preventLazyLoading` guards lists                |
-| Rate limits   | Per minute and user: 30 votes, 60 searches, 10 submissions. 10 registrations per hour and address. All tested             |
+| Check         | Result                                                                                                                                   |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Tests         | 324 tests with 1,197 assertions, against PostgreSQL                                                                                      |
+| Browser tests | 88 tests with 289 assertions                                                                                                             |
+| Coverage      | 98.3% of lines in `app/`, without browser tests                                                                                          |
+| Larastan      | Level 9, 0 errors, no baseline and no ignored errors                                                                                     |
+| Pint          | Laravel preset plus strict types and strict comparison                                                                                   |
+| Frontend      | Vite+ lint and format, `vue-tsc` without errors                                                                                          |
+| Accessibility | axe at its strictest level on all pages with a route, light and dark, 0 issues                                                           |
+| Contrast      | Tested on every visible text node in both themes, including states after an action: at least 4.5:1, or 3:1 for large text                |
+| Index use     | `EXPLAIN ANALYZE` on 100,020 rows: 1.9 ms with the GIN index, 18.2 ms without                                                            |
+| Query counts  | Constant on product list, request list, detail page and roadmap, tested. `preventLazyLoading` guards lists                               |
+| Rate limits   | Per minute and user: 30 votes, 60 searches, 10 submissions. Per address: 10 registrations an hour, 6 reset requests a minute. All tested |
 
 - **Hostile input:** A test takes every route from the router and sends arrays, NUL bytes, invalid UTF-8, overflowing ids and more in every known field and path parameter, as guest and as admin. None may end in a server error.
 - **Concurrency:** Separate processes vote at the same moment against committed rows. Removing the lock makes the test for a vote arriving during a decline fail, and removing the increment as well loses votes. Both were checked by mutation.
 - **CI:** GitHub Actions runs Pint, Larastan, the frontend checks, the tests with a PostgreSQL service, the build and the browser tests.
-- **Review:** [`/big-review`](.claude/commands/big-review.md) is a hostile audit that starts blind, without the project's explanations. It runs the machines and mutation tests, attacks every entrance on twelve axes (form, value, structure, identity, frequency, concurrency, volume, time, state, abuse, error path, display), tries abuse with several accounts, measures every claim in this README, and must list what it did not check. The first run found 4 blockers, 6 high, 16 medium and 8 low findings while all checks were green. All blockers and high findings and six medium findings are fixed with tests. The other medium and low findings are still open, and no second run has confirmed the fixes yet.
+- **Review:** [`/big-review`](.claude/commands/big-review.md) is a hostile audit that starts blind, without the project's explanations. It runs the machines and mutation tests, attacks every entrance on twelve axes (form, value, structure, identity, frequency, concurrency, volume, time, state, abuse, error path, display), tries abuse with several accounts, measures every claim in this README, and must list what it did not check. The first run found 4 blockers, 6 high, 16 medium and 8 low findings while all checks were green. All blockers and high findings and most medium findings are fixed with tests. The rest is listed with reasons in [docs/REVIEW-LEDGER.md](docs/REVIEW-LEDGER.md). No second run has confirmed the fixes yet.
 - **Limits of the tools:** axe missed two contrast failures that the calculation found, so green tools alone are not treated as proof.
 
 ## Known limitations
@@ -135,8 +135,8 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 - **Accessibility:** No test with a real screen reader and no complete manual keyboard walk through every page. Kit dialogs and menus were only checked by axe.
 - **Moderation:** Nothing public can be removed without database access, neither by admins nor by authors. Rate limits slow spam down, but declined requests stay in the list.
 - **One vote per account, not per person:** There is no email verification, so someone with several addresses and connections can vote several times.
-- **Password reset:** It reveals whether an account exists and has no rate limit of its own.
-- **Findings left open:** The review report lists further medium findings, for example sessions that survive a password change, passwords longer than bcrypt reads, and an admin who can delete the last admin account.
+- **Account discovery:** Password reset and registration reveal whether an account exists.
+- **Findings left open:** [docs/REVIEW-LEDGER.md](docs/REVIEW-LEDGER.md) lists what the review found and why it stays as it is, for example votes that stay when an author rewrites a request, and typed text lost when a session expires.
 - **Vote counts:** A direct `$user->delete()` that bypasses the `DeleteUser` action leaves counts too high.
 - **Editing:** The edit form checks its permission without a row lock, so an edit at the exact moment of a status change can still go through.
 - **Status changes:** `done` and `declined` are final and have no confirmation step, so a misclick cannot be undone in the interface.
@@ -144,5 +144,5 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 - **Roadmap:** No pagination, so the `done` column grows with the product.
 - **Sorting:** No index for sorting by votes or date yet, because the demo data does not need one.
 - **Rate limits:** The limits are estimates without real usage data.
-- **Security:** No security headers such as a Content Security Policy, and no production deployment. The seeder creates accounts with a known password.
+- **Security:** No Content Security Policy and no production deployment. The other security headers are set, except on static files served directly by the web server. The seeder creates accounts with a known password.
 - **Browsers:** Browser tests run in Chromium only. On my machine one existing Firefox profile could not open the local app. A fresh Firefox profile worked, and I did not find the cause.

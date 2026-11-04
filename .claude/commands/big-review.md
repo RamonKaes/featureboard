@@ -37,7 +37,7 @@ git rev-parse --short HEAD         # the commit this report is about
 gh run list --limit 3              # did CI see exactly this commit, and was it green?
 ```
 
-**Phase A, blind.** Until your own findings list is frozen, do **not** read `CLAUDE.md`, `docs/DECISIONS.md`, `docs/AI-WORKFLOW.md`, `docs/QUALITY.md`, `docs/reviews/`, commit message bodies or explanatory comments above a line you have not attacked yet. They explain why something should be right, and that is what stops people from checking. You may read the code, the route table, the running app, tool output, and the README as a list of claims to disprove.
+**Phase A, blind.** Until your own findings list is frozen, do **not** read `CLAUDE.md`, `docs/DECISIONS.md`, `docs/AI-WORKFLOW.md`, `docs/QUALITY.md`, `docs/REVIEW-LEDGER.md`, `docs/reviews/`, commit message bodies or explanatory comments above a line you have not attacked yet. They explain why something should be right, and that is what stops people from checking. You may read the code, the route table, the running app, tool output, and the README as a list of claims to disprove.
 
 **Evidence rules, binding for every finding:**
 
@@ -202,11 +202,11 @@ Not applicable, with the reason stated once in the report: payments and consumer
 
 ## 5. Phase B: compare
 
-Freeze your Phase A list first. After that you may add findings but never shorten the list without saying why. Now read `CLAUDE.md`, `docs/DECISIONS.md`, `docs/QUALITY.md`, `docs/AI-WORKFLOW.md`, `docs/IDEAS.md` and `docs/reviews/`.
+Freeze your Phase A list first. After that you may add findings but never shorten the list without saying why. Now read `CLAUDE.md`, `docs/DECISIONS.md`, `docs/QUALITY.md`, `docs/AI-WORKFLOW.md`, `docs/IDEAS.md`, `docs/REVIEW-LEDGER.md` and `docs/reviews/`.
 
 - A documented reason does **not** remove a finding. Test its premise. If it holds, mark the finding "known, premise checked". If not, it is a finding against the decision.
 - A documented limitation is not a free pass. Could it be solved cheaply today, and does it hold back something unrelated?
-- Findings listed as dismissed in an earlier report are only raised again with a new concrete scenario.
+- Findings in `docs/REVIEW-LEDGER.md` are only raised again with a new concrete scenario, or when the stated reason no longer holds. Check at least three of those reasons.
 - Every "fixed" claim in the log gets one spot check.
 
 ## 6. Judge and report
