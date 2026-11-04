@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 
 test('reset password link screen can be rendered', function () {
@@ -38,7 +39,7 @@ test('reset password screen can be rendered', function () {
     });
 });
 
-test('password can be reset with valid token', function () {
+test('a reset replaces the password: the new one logs in and the old one no longer does', function () {
     Notification::fake();
 
     $user = User::factory()->create();
@@ -46,19 +47,44 @@ test('password can be reset with valid token', function () {
     $this->post(route('password.email'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-        $response = $this->post(route('password.update'), [
+        $this->post(route('password.update'), [
             'token' => $notification->token,
             'email' => $user->email,
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ]);
-
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect(route('login'));
+            'password' => 'brand-new-password',
+            'password_confirmation' => 'brand-new-password',
+        ])->assertSessionHasNoErrors()->assertRedirect(route('login'));
 
         return true;
     });
+
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])
+        ->assertSessionHasErrors('email');
+    $this->assertGuest();
+
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'brand-new-password'])
+        ->assertRedirect();
+    $this->assertAuthenticatedAs($user);
+});
+
+test('a reset refuses a password that breaks the rules and keeps the old one', function () {
+    Notification::fake();
+
+    $user = User::factory()->create();
+
+    $this->post(route('password.email'), ['email' => $user->email]);
+
+    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+        $this->post(route('password.update'), [
+            'token' => $notification->token,
+            'email' => $user->email,
+            'password' => 'short',
+            'password_confirmation' => 'short',
+        ])->assertSessionHasErrors('password');
+
+        return true;
+    });
+
+    expect(Hash::check('password', (string) $user->fresh()?->password))->toBeTrue();
 });
 
 test('password cannot be reset with invalid token', function () {
