@@ -147,6 +147,17 @@ test('validation errors have enough contrast', function (bool $darkMode) {
     expect($page->script(CONTRAST_FAILURES))->toBe([]);
 })->with('color schemes');
 
+test('the hint with vote buttons has enough contrast', function (bool $darkMode) {
+    $this->actingAs($this->demo);
+
+    $page = visitInScheme('/products/rechnungsbox/requests/create', $darkMode)
+        ->type('title', 'Rechnungen Mahnungen')
+        ->assertSee('Dann stimme stattdessen ab');
+
+    expect($page->script(CONTRAST_FAILURES))->toBe([])
+        ->and($page->script(BORDER_FAILURES))->toBe([]);
+})->with('color schemes');
+
 test('the delete dialog has enough contrast', function (bool $darkMode) {
     $this->actingAs($this->demo);
 

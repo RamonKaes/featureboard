@@ -26,14 +26,24 @@ export type FeatureRequest = {
     };
 };
 
-export type SimilarFeatureRequest = Pick<
+export type FeatureRequestSummary = Pick<
     FeatureRequest,
     'id' | 'title' | 'status' | 'votesCount'
 >;
 
+export type VotableFeatureRequest = Pick<
+    FeatureRequest,
+    'id' | 'title' | 'votesCount' | 'acceptsVotes' | 'hasVoted'
+> & {
+    can: Pick<FeatureRequest['can'], 'vote'>;
+};
+
+export type SimilarFeatureRequest = FeatureRequestSummary &
+    VotableFeatureRequest;
+
 export type RoadmapColumn = {
     status: FeatureRequestStatus;
-    featureRequests: SimilarFeatureRequest[];
+    featureRequests: FeatureRequestSummary[];
 };
 
 export type SelectOption = {

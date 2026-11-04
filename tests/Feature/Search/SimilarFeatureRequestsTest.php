@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Enums\FeatureRequestStatus;
 use App\Models\FeatureRequest;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Vote;
 use Illuminate\Support\Facades\DB;
 
 function findSimilar(Product $product, string $title, ?int $except = null): array
@@ -111,7 +113,26 @@ test('results contain only what the hint needs', function () {
         'title' => 'Mahnungen erstellen',
         'status' => ['value' => 'new', 'label' => 'Neu'],
         'votesCount' => 3,
+        'acceptsVotes' => true,
+        'hasVoted' => false,
+        'can' => ['vote' => true],
     ]]);
+});
+
+test('results tell the viewer whether a vote is possible', function () {
+    $user = User::factory()->create();
+    $voted = FeatureRequest::factory()->for($this->product)->create(['title' => 'Mahnung gewählt', 'votes_count' => 3]);
+    Vote::factory()->for($user)->for($voted)->create();
+    $own = FeatureRequest::factory()->for($this->product)->for($user, 'author')->create(['title' => 'Mahnung eigen', 'votes_count' => 2]);
+    $done = FeatureRequest::factory()->for($this->product)->create(['title' => 'Mahnung fertig', 'status' => FeatureRequestStatus::Done, 'votes_count' => 1]);
+
+    $results = collect($this->actingAs($user)
+        ->getJson(route('feature-requests.similar', [$this->product, 'title' => 'Mahnung']))
+        ->json())->keyBy('id');
+
+    expect($results[$voted->id])->toMatchArray(['hasVoted' => true, 'acceptsVotes' => true, 'can' => ['vote' => true]])
+        ->and($results[$own->id])->toMatchArray(['hasVoted' => false, 'acceptsVotes' => true, 'can' => ['vote' => false]])
+        ->and($results[$done->id])->toMatchArray(['hasVoted' => false, 'acceptsVotes' => false, 'can' => ['vote' => false]]);
 });
 
 test('input without searchable words returns nothing', function (string $title) {

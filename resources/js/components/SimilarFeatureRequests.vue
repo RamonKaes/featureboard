@@ -4,6 +4,7 @@ import { watchDebounced } from '@vueuse/core';
 import { ref } from 'vue';
 import { show } from '@/actions/App/Http/Controllers/FeatureRequestController';
 import StatusBadge from '@/components/StatusBadge.vue';
+import VoteButton from '@/components/VoteButton.vue';
 import { similar } from '@/routes/feature-requests';
 import type { Product, SimilarFeatureRequest } from '@/types';
 
@@ -25,24 +26,24 @@ const http = useHttp<
     except: props.except ?? null,
 });
 
-watchDebounced(
-    () => props.title.trim(),
-    (title) => {
-        http.cancel();
+function search(): void {
+    const title = props.title.trim();
 
-        if (title.length < MIN_LENGTH) {
-            results.value = [];
+    http.cancel();
 
-            return;
-        }
+    if (title.length < MIN_LENGTH) {
+        results.value = [];
 
-        http.title = title;
-        void http.get(similar.url(props.product.slug), {
-            onSuccess: (response) => (results.value = response),
-        });
-    },
-    { debounce: DEBOUNCE_MS },
-);
+        return;
+    }
+
+    http.title = title;
+    void http.get(similar.url(props.product.slug), {
+        onSuccess: (response) => (results.value = response),
+    });
+}
+
+watchDebounced(() => props.title.trim(), search, { debounce: DEBOUNCE_MS });
 </script>
 
 <template>
@@ -52,36 +53,37 @@ watchDebounced(
             class="space-y-2 rounded-md border border-border bg-muted/50 p-3"
         >
             <h2 class="text-sm font-medium">
-                Ähnliche Wünsche, vielleicht gibt es deinen schon:
+                {{
+                    except
+                        ? 'Ähnliche Wünsche:'
+                        : 'Gibt es deinen Wunsch schon? Dann stimme stattdessen ab:'
+                }}
             </h2>
-            <ul class="space-y-1">
+            <ul class="space-y-2">
                 <li
                     v-for="result in results"
                     :key="result.id"
-                    class="flex flex-wrap items-center gap-2 text-sm"
+                    class="flex items-center gap-3 text-sm"
                 >
-                    <a
-                        :href="
-                            show.url({
-                                product: product.slug,
-                                featureRequest: result.id,
-                            })
-                        "
-                        target="_blank"
-                        rel="noopener"
-                        class="underline underline-offset-4"
-                    >
-                        {{ result.title }}
-                        <span class="sr-only">(öffnet in neuem Tab)</span>
-                    </a>
-                    <StatusBadge :status="result.status" />
-                    <span class="text-xs text-muted-foreground">
-                        {{
-                            result.votesCount === 1
-                                ? '1 Stimme'
-                                : `${result.votesCount} Stimmen`
-                        }}
-                    </span>
+                    <!-- The results are not page props, so ask again once the vote is through. -->
+                    <VoteButton :feature-request="result" @settled="search" />
+                    <div class="flex min-w-0 flex-wrap items-center gap-2">
+                        <a
+                            :href="
+                                show.url({
+                                    product: product.slug,
+                                    featureRequest: result.id,
+                                })
+                            "
+                            target="_blank"
+                            rel="noopener"
+                            class="wrap-anywhere underline underline-offset-4"
+                        >
+                            {{ result.title }}
+                            <span class="sr-only">(öffnet in neuem Tab)</span>
+                        </a>
+                        <StatusBadge :status="result.status" />
+                    </div>
                 </li>
             </ul>
         </section>

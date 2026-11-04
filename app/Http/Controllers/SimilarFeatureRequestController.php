@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SimilarFeatureRequestsRequest;
-use App\Http\Resources\FeatureRequestSummaryResource;
+use App\Http\Resources\SimilarFeatureRequestResource;
 use App\Models\Product;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -21,9 +21,10 @@ class SimilarFeatureRequestController extends Controller
         $featureRequests = $product->featureRequests()
             ->similarTo($request->string('title')->toString())
             ->when($request->integer('except'), fn ($query, int $except) => $query->whereKeyNot($except))
+            ->withVoteOf($request->user())
             ->limit(self::LIMIT)
             ->get();
 
-        return FeatureRequestSummaryResource::collection($featureRequests);
+        return SimilarFeatureRequestResource::collection($featureRequests);
     }
 }

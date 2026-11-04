@@ -42,6 +42,47 @@ test('a user sees similar requests while typing and submits a new one', function
     expect(FeatureRequest::query()->where('title', 'Groesse der Logos')->exists())->toBeTrue();
 });
 
+test('a user votes from the hint instead of submitting a duplicate', function () {
+    $user = User::query()->where('email', 'demo@featureboard.test')->sole();
+    $featureRequest = FeatureRequest::query()->where('title', 'Größere Logos im Rechnungskopf')->sole();
+    $before = $featureRequest->votes_count;
+    $button = '[aria-label^="Für „Größere Logos im Rechnungskopf“ abstimmen"]';
+    $submissions = FeatureRequest::query()->count();
+
+    $this->actingAs($user);
+
+    $page = visit('/products/rechnungsbox/requests/create')
+        ->fill('description', 'Mein halb geschriebener Text')
+        ->type('title', 'Groesse der Logos')
+        ->assertSee('Dann stimme stattdessen ab')
+        ->click($button)
+        ->wait(0.5);
+
+    expect($page->script("document.querySelector('{$button}').getAttribute('aria-pressed')"))->toBe('true')
+        ->and($page->script("document.querySelector('{$button}').getAttribute('aria-label')"))->toContain(($before + 1).' Stimme')
+        ->and($page->script("document.getElementById('title').value"))->toBe('Groesse der Logos')
+        ->and($page->script("document.getElementById('description').value"))->toBe('Mein halb geschriebener Text')
+        ->and($featureRequest->fresh()?->votes_count)->toBe($before + 1)
+        ->and($featureRequest->votes()->where('user_id', $user->id)->exists())->toBeTrue()
+        ->and(FeatureRequest::query()->count())->toBe($submissions);
+
+    $page->click($button)->wait(0.5);
+
+    expect($page->script("document.querySelector('{$button}').getAttribute('aria-pressed')"))->toBe('false')
+        ->and($featureRequest->fresh()?->votes_count)->toBe($before);
+});
+
+test('editing an own request shows similar ones without asking to vote instead', function () {
+    $featureRequest = FeatureRequest::query()->where('title', 'Größere Logos im Rechnungskopf')->sole();
+    $this->actingAs($featureRequest->author);
+
+    visit("/products/rechnungsbox/requests/{$featureRequest->id}/edit")
+        ->assertSee('Wunsch bearbeiten')
+        ->type('title', 'Rechnungen versenden')
+        ->assertSee('Ähnliche Wünsche')
+        ->assertDontSee('stattdessen');
+});
+
 test('an admin moves a request through the workflow', function () {
     $this->actingAs(User::query()->where('email', 'admin@featureboard.test')->sole());
     $featureRequest = FeatureRequest::query()->where('title', 'Warteliste für ausgebuchte Tage')->sole();

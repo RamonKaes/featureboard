@@ -58,3 +58,20 @@ test('the detail page needs the same number of queries for few or many votes', f
 
     expect($many)->toBe($few);
 });
+
+test('the search for similar requests needs the same number of queries for one or many rows', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create();
+    FeatureRequest::factory()->for($product)->create(['title' => 'Mahnung eins']);
+    $url = route('feature-requests.similar', [$product, 'title' => 'Mahnung']);
+
+    $this->actingAs($user);
+    $one = countQueries(fn () => $this->getJson($url)->assertOk());
+
+    FeatureRequest::factory()->count(4)->for($product)->create(['title' => 'Mahnung viele'])
+        ->each(fn (FeatureRequest $featureRequest) => Vote::factory()->for($user)->for($featureRequest)->create());
+
+    $five = countQueries(fn () => $this->getJson($url)->assertOk()->assertJsonCount(5));
+
+    expect($five)->toBe($one);
+});

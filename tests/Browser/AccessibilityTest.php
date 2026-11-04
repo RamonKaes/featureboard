@@ -78,6 +78,17 @@ test('the status controls for admins have no accessibility issues', function (bo
     assertAccessible(requestPath('Mahnungen in mehreren Stufen'), 'Mahnungen in mehreren Stufen', $darkMode);
 })->with('color schemes');
 
+test('the hint with vote buttons has no accessibility issues', function (bool $darkMode) {
+    $this->actingAs(demoUser());
+
+    $page = visit('/products/rechnungsbox/requests/create');
+
+    ($darkMode ? $page->inDarkMode() : $page)
+        ->type('title', 'Rechnungen Mahnungen')
+        ->assertSee('Dann stimme stattdessen ab')
+        ->assertNoAccessibilityIssues(3);
+})->with('color schemes');
+
 test('form errors have no accessibility issues', function () {
     $this->actingAs(demoUser());
 

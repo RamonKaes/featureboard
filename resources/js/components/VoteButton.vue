@@ -9,11 +9,13 @@ import {
 } from '@/actions/App/Http/Controllers/FeatureRequestVoteController';
 import { cn } from '@/lib/utils';
 import { login } from '@/routes';
-import type { FeatureRequest, Paginated } from '@/types';
+import type { FeatureRequest, Paginated, VotableFeatureRequest } from '@/types';
 
 const props = defineProps<{
-    featureRequest: FeatureRequest;
+    featureRequest: VotableFeatureRequest;
 }>();
+
+const emit = defineEmits<{ settled: [] }>();
 
 const page = usePage();
 const isSubmitting = ref(false);
@@ -100,6 +102,7 @@ function toggleVote(): void {
         onFinish: () => {
             isSubmitting.value = false;
             void restoreFocus();
+            emit('settled');
         },
         onHttpException: showFailure,
         onNetworkError: showFailure,
