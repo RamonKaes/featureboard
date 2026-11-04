@@ -177,7 +177,7 @@ Die Zahlen sind am aktuellen Code gemessen.
 | Prüfung           | Ergebnis                                                                                               |
 | ----------------- | ------------------------------------------------------------------------------------------------------ |
 | Tests             | 355 Tests mit 1.349 Assertions gegen echtes PostgreSQL, 98,4 % der Zeilen in `app/`                    |
-| Browser-Tests     | 107 Tests mit 345 Assertions in Chromium                                                               |
+| Browser-Tests     | 111 Tests mit 364 Assertions in Chromium                                                               |
 | Statische Analyse | Larastan Stufe 9 ohne Baseline und ohne Ausnahmen, Pint mit strengen Regeln, Vite+, `vue-tsc`          |
 | Barrierefreiheit  | axe auf der strengsten Stufe auf allen Seiten, hell und dunkel, als Gast, Nutzer und Admin: 0 Probleme |
 | Kontrast          | Berechnet für jeden sichtbaren Text und die Rahmen von Bedienelementen, in beiden Themes               |
@@ -196,21 +196,21 @@ Ein paar Entscheidungen stecken hinter diesen Zeilen:
 
 Das Ziel ist WCAG 2.2 AA. Gefunden wurde vieles, und zwar nicht nur von Werkzeugen:
 
-| Problem                                               | WCAG   | Gefunden durch | Lösung                                             |
-| ----------------------------------------------------- | ------ | -------------- | -------------------------------------------------- |
-| Gedämpfter Text auf gedämpftem Grund, 4,35:1          | 1.4.3  | Berechnung     | Farbe angehoben, 4,89:1                            |
-| Rahmen von Eingabefeldern, 1,26:1 hell, 1,31:1 dunkel | 1.4.11 | Berechnung     | Farbe angehoben, 3,23:1 und 4,30:1                 |
-| Rahmen von Outline-Buttons, 1,17:1 hell               | 1.4.11 | Review         | Gleiche Farbe wie Felder, jetzt per Test           |
-| Positiver `tabindex` bei Login und Registrierung      | 2.4.3  | axe, Scan      | Entfernt                                           |
-| Passwort-Schalter per Tastatur nicht erreichbar       | 2.1.1  | Scan           | `tabindex="-1"` entfernt                           |
-| Anmeldeseiten ohne `main`                             | 1.3.1  | axe            | Layout nutzt `main`                                |
-| Englische Seiten in einem deutschen Dokument          | 3.1.1  | Review         | Übersetzt                                          |
-| Kein Weg am Kopfbereich vorbei                        | 2.4.1  | Review         | Skip-Link                                          |
-| Seitenwechsel lautlos, Fokus verloren                 | 2.4.3  | Review         | Fokus wandert zu `main`                            |
-| Fokus weg nach Statuswechsel oder Abstimmung          | 2.4.3  | Review         | Fokus wandert zum Status oder zurück zum Button    |
-| Formularfehler nicht angesagt oder nicht verknüpft    | 4.1.3  | Review         | `role="alert"`, `aria-describedby`, `aria-invalid` |
-| Pflichtfelder nicht als Text markiert                 | 3.3.2  | Review         | Hinweis über dem Formular                          |
-| Einstellungsseiten ohne oder mit zwei `h1`            | 1.3.1  | Review         | Genau ein `h1`, per Test gezählt                   |
+| Problem                                                                              | WCAG   | Gefunden durch | Lösung                                                      |
+| ------------------------------------------------------------------------------------ | ------ | -------------- | ----------------------------------------------------------- |
+| Gedämpfter Text auf gedämpftem Grund, 4,35:1                                         | 1.4.3  | Berechnung     | Farbe angehoben, 4,89:1                                     |
+| Rahmen von Eingabefeldern, 1,26:1 hell, 1,31:1 dunkel                                | 1.4.11 | Berechnung     | Farbe angehoben, 3,23:1 und 4,30:1                          |
+| Rahmen von Outline-Buttons, 1,17:1 hell                                              | 1.4.11 | Review         | Gleiche Farbe wie Felder, jetzt per Test                    |
+| Positiver `tabindex` bei Login und Registrierung                                     | 2.4.3  | axe, Scan      | Entfernt                                                    |
+| Passwort-Schalter per Tastatur nicht erreichbar                                      | 2.1.1  | Scan           | `tabindex="-1"` entfernt                                    |
+| Anmeldeseiten ohne `main`                                                            | 1.3.1  | axe            | Layout nutzt `main`                                         |
+| Englische Seiten in einem deutschen Dokument                                         | 3.1.1  | Review         | Übersetzt                                                   |
+| Kein Weg am Kopfbereich vorbei                                                       | 2.4.1  | Review         | Skip-Link                                                   |
+| Seitenwechsel lautlos, Fokus verloren                                                | 2.4.3  | Review         | Fokus wandert zu `main`                                     |
+| Fokus weg nach Statuswechsel, Abstimmung, Blättern oder Fehlern in den Einstellungen | 2.4.3  | Review         | Fokus wandert zum Status, Button, Inhalt oder ersten Fehler |
+| Formularfehler nicht angesagt oder nicht verknüpft                                   | 4.1.3  | Review         | `role="alert"`, `aria-describedby`, `aria-invalid`          |
+| Pflichtfelder nicht als Text markiert                                                | 3.3.2  | Review         | Hinweis über dem Formular                                   |
+| Einstellungsseiten ohne oder mit zwei `h1`                                           | 1.3.1  | Review         | Genau ein `h1`, per Test gezählt                            |
 
 Die Kontrastwerte am Ende:
 
@@ -334,6 +334,9 @@ Nicht jeder Review-Befund lohnt für eine Demo eine Lösung. Diese bleiben mit A
 | Kein `trustProxies`, `X-Powered-By` wird gesendet                   | Beides hängt vom echten Server ab                                                                                                                                                                                  | Die Anwendung live geht                          |
 | Erfolgsmeldung im dunklen Modus unauffällig                         | Der Text ist mit 18,97:1 gut lesbar, nur der Rahmen ist blass                                                                                                                                                      | Nutzer die Meldung übersehen                     |
 | `email` akzeptiert `a@b`                                            | Das ist nach RFC gültig, und DNS-Prüfungen bringen ohne Bestätigung wenig                                                                                                                                          | E-Mail-Bestätigung dazukommt                     |
+| Falsches Passwort bleibt nach einem gescheiterten Login stehen      | So lässt sich ein Tippfehler korrigieren, das Feld ist verdeckt                                                                                                                                                    | Für sich allein nie                              |
+| Fehlermeldungen bleiben bis zum nächsten Absenden stehen            | Das ist das Verhalten von Inertia, eine Prüfung beim Tippen wäre eine eigene Funktion                                                                                                                              | Nutzer das verwirrt                              |
+| Profil zeigt die E-Mail nach dem Speichern wie getippt              | Gespeichert ist sie kleingeschrieben, nach dem Neuladen stimmt die Anzeige                                                                                                                                         | Für sich allein nie                              |
 | `Too Many Attempts.` als JSON ist unübersetzt                       | Nur die Suchanfrage sieht es, die Oberfläche zeigt den Text nicht                                                                                                                                                  | Für sich allein nie                              |
 
 ### Ideen für später

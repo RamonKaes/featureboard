@@ -56,4 +56,5 @@ Each rule comes from a concrete case.
 - **A rule about other rows needs locks on those rows.** The last admin check counted outside the transaction and locked only the own row, so two admins leaving at once removed every admin. PostgreSQL refuses `FOR UPDATE` with `count()`, so load the locked rows and count those.
 - **Prove which database an instance uses.** Without `--no-reload`, `artisan serve` drops `DB_DATABASE` and `APP_DEBUG` and falls back to `.env`. A marker row in the target database shows the truth.
 - **`sail exec` runs as root.** A check started that way left root-owned files in `public/build`, and the next build failed. Use `sail composer`, `sail npm`, or `sail exec --user sail`.
+- **Walk through the app by hand as well.** A walk through every role found lost focus and an input that undid Inertia's reset, after hundreds of green browser tests. Tests only ask what someone thought of.
 - **Check the kit's `.gitignore`.** It ignored `CLAUDE.md`, which this project must commit.

@@ -12,20 +12,23 @@ Results of the audit in stage 7, measured on 2026-11-03. Target: WCAG 2.2 AA.
 
 **Problems found and fixed:**
 
-| Problem                                                     | WCAG   | Found by    | Fix                                           |
-| ----------------------------------------------------------- | ------ | ----------- | --------------------------------------------- |
-| Muted text on muted background, 4.35:1                      | 1.4.3  | Calculation | `--muted-foreground` to 42% lightness, 4.89:1 |
-| Input borders, 1.26:1 light and 1.31:1 dark                 | 1.4.11 | Calculation | `--input` raised, 3.23:1 and 4.30:1           |
-| Positive `tabindex` in login and registration               | 2.4.3  | axe, scan   | Removed                                       |
-| Password toggle not reachable by keyboard (`tabindex="-1"`) | 2.1.1  | Scan        | Removed                                       |
-| Auth pages without `main` landmark                          | 1.3.1  | axe         | Layout uses `main`                            |
-| English pages in a document declared German                 | 3.1.1  | Review      | Translated                                    |
-| No way to skip the header                                   | 2.4.1  | Review      | Skip link                                     |
-| Page changes silent, focus lost                             | 2.4.3  | Review      | Focus moves to `main` on a new path           |
-| Focus lost after a status change                            | 2.4.3  | Review      | Focus moves to the status area or heading     |
-| Form errors not announced                                   | 4.1.3  | Review      | `role="alert"` in `InputError`                |
-| Required fields not marked in text                          | 3.3.2  | Review      | Note above the form                           |
-| Settings pages without `h1`                                 | 1.3.1  | Review      | Heading is an `h1`                            |
+| Problem                                                     | WCAG   | Found by     | Fix                                           |
+| ----------------------------------------------------------- | ------ | ------------ | --------------------------------------------- |
+| Muted text on muted background, 4.35:1                      | 1.4.3  | Calculation  | `--muted-foreground` to 42% lightness, 4.89:1 |
+| Input borders, 1.26:1 light and 1.31:1 dark                 | 1.4.11 | Calculation  | `--input` raised, 3.23:1 and 4.30:1           |
+| Positive `tabindex` in login and registration               | 2.4.3  | axe, scan    | Removed                                       |
+| Password toggle not reachable by keyboard (`tabindex="-1"`) | 2.1.1  | Scan         | Removed                                       |
+| Auth pages without `main` landmark                          | 1.3.1  | axe          | Layout uses `main`                            |
+| English pages in a document declared German                 | 3.1.1  | Review       | Translated                                    |
+| No way to skip the header                                   | 2.4.1  | Review       | Skip link                                     |
+| Page changes silent, focus lost                             | 2.4.3  | Review       | Focus moves to `main` on a new path           |
+| Focus lost after a status change                            | 2.4.3  | Review       | Focus moves to the status area or heading     |
+| Form errors not announced                                   | 4.1.3  | Review       | `role="alert"` in `InputError`                |
+| Required fields not marked in text                          | 3.3.2  | Review       | Note above the form                           |
+| Settings pages without `h1`                                 | 1.3.1  | Review       | Heading is an `h1`                            |
+| Focus lost after turning a page                             | 2.4.3  | Browser walk | Focus moves to `main`                         |
+| Focus lost after errors in the settings                     | 2.4.3  | Browser walk | Focus moves to the first invalid field        |
+| Dialog close button named in English                        | 3.1.2  | Browser walk | Translated                                    |
 
 **Final contrast ratios:**
 

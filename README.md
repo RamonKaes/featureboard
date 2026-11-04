@@ -124,7 +124,7 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 | Check           | Result                                                                                                                                                       |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Tests           | 355 tests with 1,349 assertions against PostgreSQL, 98.4% of lines in `app/`                                                                                 |
-| Browser tests   | 107 tests with 345 assertions in Chromium                                                                                                                    |
+| Browser tests   | 111 tests with 364 assertions in Chromium                                                                                                                    |
 | Static analysis | Larastan level 9 without baseline, Pint, Vite+, `vue-tsc`                                                                                                    |
 | Accessibility   | axe at its strictest level on all pages with a route, light and dark, 0 issues                                                                               |
 | Contrast        | Calculated for every visible text and the borders of controls, in both themes                                                                                |

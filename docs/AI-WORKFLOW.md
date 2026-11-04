@@ -164,3 +164,11 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 - `sail exec` runs as root and left root-owned files, which made a build fail. A cut output line hid that failure, and a commit went in before the result was read.
 - A `git checkout` during a mutation check reverted uncommitted work, which then had to be applied again.
 - `.mcp.json` was in the kit's `.gitignore`, so a commit first lacked the file it named.
+
+## After stage 8: Walk through the app in the browser
+
+**Asked for:** A complete manual test in the built-in browser that touches everything. Claude used Laravel Boost from Claude Code for the first time here, to read the database and the last error.
+
+**Found:** No server errors, but seven small flaws that no test covered. The author chose to fix four: lost focus after turning a page, lost focus after errors in the settings, an English label in the dialog, and a wrong current password that stayed in its field. The other three went to the ledger.
+
+**Cause of the last one:** The kit's input kept a private copy of its value, so rendering wrote it back over Inertia's reset. Only the field with a new error rendered again, which is why the other two were cleared.
