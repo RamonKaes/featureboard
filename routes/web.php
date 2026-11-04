@@ -9,6 +9,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoadmapController;
 use App\Http\Controllers\SimilarFeatureRequestController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Http\Controllers\NewPasswordController;
+use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
@@ -36,6 +38,12 @@ Route::scopeBindings()->prefix('products/{product:slug}/requests')->name('featur
 Route::post('register', [RegisteredUserController::class, 'store'])
     ->middleware(['guest', 'throttle:registrations'])
     ->name('register.store');
+
+// The same goes for both password reset routes.
+Route::middleware(['guest', 'throttle:password-resets'])->group(function () {
+    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.update');
+});
 
 Route::middleware('auth')->group(function () {
     // Fortify registers these routes even though password confirmation is not used.

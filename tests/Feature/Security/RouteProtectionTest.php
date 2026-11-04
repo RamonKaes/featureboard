@@ -116,8 +116,6 @@ test('the configured host keeps working behind the host check', function () {
 test('every writing route has a rate limit or is exempt for a stated reason', function () {
     $exempt = [
         'logout' => 'ends the own session',
-        'password.email' => 'open finding M6 of the review',
-        'password.update' => 'open finding M6 of the review',
         'profile.update' => 'changes only the own account',
         'profile.destroy' => 'needs the password and ends the account',
         'feature-requests.status.update' => 'admins only',

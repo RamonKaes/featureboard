@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RejectMalformedInput;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,6 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance']);
 
         $middleware->prepend(RejectMalformedInput::class);
+        $middleware->prepend(SecurityHeaders::class);
+
+        // Ends other sessions as soon as the password changes.
+        $middleware->authenticateSessions();
 
         $middleware->trustHosts();
 
