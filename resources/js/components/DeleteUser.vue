@@ -71,7 +71,9 @@ const passwordInput = useTemplateRef('passwordInput');
                             >
                             <PasswordInput
                                 id="password"
-                                :aria-invalid="errors.password ? true : undefined"
+                                :aria-invalid="
+                                    errors.password ? true : undefined
+                                "
                                 aria-describedby="password-error"
                                 name="password"
                                 ref="passwordInput"

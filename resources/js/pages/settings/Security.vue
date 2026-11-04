@@ -80,17 +80,16 @@ defineOptions({
                     placeholder="Neues Passwort"
                     :passwordrules="props.passwordRules"
                 />
-                <InputError
-                    id="password-error"
-                    :message="errors.password"
-                />
+                <InputError id="password-error" :message="errors.password" />
             </div>
 
             <div class="grid gap-2">
                 <Label for="password_confirmation">Passwort bestätigen</Label>
                 <PasswordInput
                     id="password_confirmation"
-                    :aria-invalid="errors.password_confirmation ? true : undefined"
+                    :aria-invalid="
+                        errors.password_confirmation ? true : undefined
+                    "
                     aria-describedby="password_confirmation-error"
                     name="password_confirmation"
                     class="mt-1 block w-full"
