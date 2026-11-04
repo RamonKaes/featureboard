@@ -53,16 +53,16 @@ Results of the audit in stage 7, measured on 2026-11-03. Target: WCAG 2.2 AA.
 
 ## Security
 
-| Area            | Result                                                                                                                                                                            |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Mass assignment | `is_admin`, `status`, `votes_count`, `user_id` and `product_id` are not fillable. Tested through registration and forms.                                                          |
-| Authorization   | A test fails when a route is neither on the public list nor behind `auth`. Policies are checked in routes and actions.                                                            |
-| Rate limiting   | Per minute and user: 30 votes, 60 searches, 10 submissions. Per address: 10 registrations an hour, 6 reset requests a minute. Tested. Login uses Fortify's limit of 5 per minute. |
-| XSS             | No `v-html` or unescaped Blade output in the app's own code. A browser test confirms that HTML in user text does not run.                                                         |
-| Hostile input   | Every route, field and path parameter is attacked with arrays, NUL bytes, invalid UTF-8 and overflowing ids, as guest and as admin, with no server error.                         |
-| SQL injection   | Search input reduced to letters and digits and passed as a binding, tested with injection strings.                                                                                |
-| Data exposure   | Resources list their fields explicitly, tested that other users' email addresses do not appear.                                                                                   |
-| Dependencies    | `composer audit` and `npm audit` report no known vulnerabilities.                                                                                                                 |
+| Area            | Result                                                                                                                                                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Mass assignment | `is_admin`, `status`, `votes_count`, `user_id` and `product_id` are not fillable. Tested through registration and forms.                                                                                                        |
+| Authorization   | A test fails when a route is neither on the public list nor behind `auth`. Policies are checked in routes and actions.                                                                                                          |
+| Rate limiting   | Per minute and user: 30 votes, 60 searches, 10 submissions. Per address: 10 registrations an hour, 6 reset requests a minute. Tested. Login allows 5 per minute for each email and address, and 30 per minute for each address. |
+| XSS             | No `v-html` or unescaped Blade output in the app's own code. A browser test confirms that HTML in user text does not run.                                                                                                       |
+| Hostile input   | Every route, field and path parameter is attacked with arrays, NUL bytes, invalid UTF-8 and overflowing ids, as guest and as admin, with no server error.                                                                       |
+| SQL injection   | Search input reduced to letters and digits and passed as a binding, tested with injection strings.                                                                                                                              |
+| Data exposure   | Resources list their fields explicitly, tested that other users' email addresses do not appear.                                                                                                                                 |
+| Dependencies    | `composer audit` and `npm audit` report no known vulnerabilities.                                                                                                                                                               |
 
 **Not covered:** A Content Security Policy, and production hardening. The seeder creates accounts with a known password and is meant for local use only.
 

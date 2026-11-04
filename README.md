@@ -4,6 +4,8 @@
 
 Feature request and roadmap board for software products, built with Laravel, Inertia, Vue and PostgreSQL.
 
+Eine ausführliche deutsche Fassung steht in [LIESMICH.md](LIESMICH.md).
+
 ## Setup
 
 You need Git and Docker with Compose. PHP and Node run inside the containers.
