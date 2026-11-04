@@ -53,4 +53,6 @@ Each rule comes from a concrete case.
 - **Verify after starting something.** A session asked to use another model ran on the default, and nobody checked until minutes later. Read back what was really set.
 - **Bind every form field the same way.** A `:value` next to a `v-model` in one form slot erased the description on every keystroke in the title, and only one fill order was tested.
 - **Error views need their exact status.** `errors/4xx.blade.php` looked like enough, but Laravel's own `403` or `404` views win over it, so each one needs its own file.
+- **A rule about other rows needs locks on those rows.** The last admin check counted outside the transaction and locked only the own row, so two admins leaving at once removed every admin. PostgreSQL refuses `FOR UPDATE` with `count()`, so load the locked rows and count those.
+- **Prove which database an instance uses.** Without `--no-reload`, `artisan serve` drops `DB_DATABASE` and `APP_DEBUG` and falls back to `.env`. A marker row in the target database shows the truth.
 - **Check the kit's `.gitignore`.** It ignored `CLAUDE.md`, which this project must commit.

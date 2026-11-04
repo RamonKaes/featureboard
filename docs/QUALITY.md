@@ -29,18 +29,18 @@ Results of the audit in stage 7, measured on 2026-11-03. Target: WCAG 2.2 AA.
 
 **Final contrast ratios:**
 
-| Pair                     | Light   | Dark    |
-| ------------------------ | ------- | ------- |
-| Muted text on background | 5.33:1  | 7.85:1  |
-| Muted text on muted      | 4.89:1  | 5.77:1  |
-| Primary button           | 17.18:1 | 17.18:1 |
-| Error text               | 4.77:1  | 5.20:1  |
-| Badge "Neu"              | 8.24:1  | 12.08:1 |
-| Badge "Geplant"          | 9.29:1  | 12.83:1 |
-| Badge "In Arbeit"        | 8.13:1  | 13.47:1 |
-| Badge "Erledigt"         | 8.47:1  | 13.36:1 |
-| Input border (needs 3:1) | 3.23:1  | 4.30:1  |
-| Focus ring (needs 3:1)   | 3.74:1  | 3.94:1  |
+| Pair                                        | Light   | Dark    |
+| ------------------------------------------- | ------- | ------- |
+| Muted text on background                    | 5.33:1  | 7.85:1  |
+| Muted text on muted                         | 4.89:1  | 5.77:1  |
+| Primary button                              | 17.18:1 | 17.18:1 |
+| Error text                                  | 4.77:1  | 5.20:1  |
+| Badge "Neu"                                 | 8.24:1  | 12.08:1 |
+| Badge "Geplant"                             | 9.29:1  | 12.83:1 |
+| Badge "In Arbeit"                           | 8.13:1  | 13.47:1 |
+| Badge "Erledigt"                            | 8.47:1  | 13.36:1 |
+| Field and outline button border (needs 3:1) | 3.23:1  | 4.30:1  |
+| Focus ring (needs 3:1)                      | 3.74:1  | 3.94:1  |
 
 **Limits of the tools:** axe did not report the two contrast failures. It skips `aria-hidden` text, and it does not check borders. A green axe run is therefore not proof of conformance.
 

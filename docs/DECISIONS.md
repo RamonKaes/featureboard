@@ -117,6 +117,8 @@ The unique vote, valid statuses and non-negative counts are database constraints
 
 **Reason:** The check must see the state inside the lock. A check in the controller would read the row earlier and could be outdated when the write happens.
 
+The rule that the last admin stays follows the same idea. A review showed that two admins leaving at once both passed a validator, so `DeleteUser` now locks all admin rows in a fixed order and decides there.
+
 ## 16. Public pages and the header layout
 
 **Decision:** Products, lists and details are public. Submitting, editing and voting need an account. The kit's sidebar, dashboard and welcome page are removed, and `/` shows the products.

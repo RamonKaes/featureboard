@@ -109,19 +109,19 @@ The full reasoning, with options and measurements, is in [docs/DECISIONS.md](doc
 
 All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.md) for the audit.
 
-| Check         | Result                                                                                                                                   |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Tests         | 324 tests with 1,197 assertions, against PostgreSQL                                                                                      |
-| Browser tests | 88 tests with 289 assertions                                                                                                             |
-| Coverage      | 98.3% of lines in `app/`, without browser tests                                                                                          |
-| Larastan      | Level 9, 0 errors, no baseline and no ignored errors                                                                                     |
-| Pint          | Laravel preset plus strict types and strict comparison                                                                                   |
-| Frontend      | Vite+ lint and format, `vue-tsc` without errors                                                                                          |
-| Accessibility | axe at its strictest level on all pages with a route, light and dark, 0 issues                                                           |
-| Contrast      | Tested on every visible text node in both themes, including states after an action: at least 4.5:1, or 3:1 for large text                |
-| Index use     | `EXPLAIN ANALYZE` on 100,020 rows: 1.9 ms with the GIN index, 18.2 ms without                                                            |
-| Query counts  | Constant on product list, request list, detail page and roadmap, tested. `preventLazyLoading` guards lists                               |
-| Rate limits   | Per minute and user: 30 votes, 60 searches, 10 submissions. Per address: 10 registrations an hour, 6 reset requests a minute. All tested |
+| Check         | Result                                                                                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Tests         | 353 tests with 1,327 assertions, against PostgreSQL                                                                                                          |
+| Browser tests | 101 tests with 322 assertions                                                                                                                                |
+| Coverage      | 98.3% of lines in `app/`, without browser tests                                                                                                              |
+| Larastan      | Level 9, 0 errors, no baseline and no ignored errors                                                                                                         |
+| Pint          | Laravel preset plus strict types and strict comparison                                                                                                       |
+| Frontend      | Vite+ lint and format, `vue-tsc` without errors                                                                                                              |
+| Accessibility | axe at its strictest level on all pages with a route, light and dark, 0 issues                                                                               |
+| Contrast      | Tested on every visible text node in both themes, including states after an action: at least 4.5:1, or 3:1 for large text                                    |
+| Index use     | `EXPLAIN ANALYZE` on 100,020 rows: 1.9 ms with the GIN index, 18.2 ms without                                                                                |
+| Query counts  | Constant on product list, request list, detail page and roadmap, tested. `preventLazyLoading` guards lists                                                   |
+| Rate limits   | Per minute and user: 30 votes, 60 searches, 10 submissions. Per address: 30 logins a minute, 10 registrations an hour, 6 reset requests a minute. All tested |
 
 - **Hostile input:** A test takes every route from the router and sends arrays, NUL bytes, invalid UTF-8, overflowing ids and more in every known field and path parameter, as guest and as admin. None may end in a server error.
 - **Concurrency:** Separate processes vote at the same moment against committed rows. Removing the lock makes the test for a vote arriving during a decline fail, and removing the increment as well loses votes. Both were checked by mutation.
@@ -135,7 +135,7 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 - **Accessibility:** No test with a real screen reader and no complete manual keyboard walk through every page. Kit dialogs and menus were only checked by axe.
 - **Moderation:** Nothing public can be removed without database access, neither by admins nor by authors. Rate limits slow spam down, but declined requests stay in the list.
 - **One vote per account, not per person:** There is no email verification, so someone with several addresses and connections can vote several times.
-- **Account discovery:** Password reset and registration reveal whether an account exists.
+- **Account discovery:** Password reset and registration reveal whether an account exists. Under heavy server load the login does too, through its response time. Limits per address slow all three down.
 - **Findings left open:** [docs/REVIEW-LEDGER.md](docs/REVIEW-LEDGER.md) lists what the review found and why it stays as it is, for example votes that stay when an author rewrites a request, and typed text lost when a session expires.
 - **Vote counts:** A direct `$user->delete()` that bypasses the `DeleteUser` action leaves counts too high.
 - **Editing:** The edit form checks its permission without a row lock, so an edit at the exact moment of a status change can still go through.
