@@ -56,3 +56,15 @@ test('users are rate limited', function () {
 
     $response->assertTooManyRequests();
 });
+
+test('one address cannot try unlimited accounts', function () {
+    foreach (range(1, 30) as $attempt) {
+        $this->post(route('login.store'), ['email' => "guess{$attempt}@example.com"])->assertRedirect();
+    }
+
+    $this->post(route('login.store'), ['email' => 'guess31@example.com'])->assertTooManyRequests();
+
+    $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.9'])
+        ->post(route('login.store'), ['email' => 'guess31@example.com'])
+        ->assertRedirect();
+});
