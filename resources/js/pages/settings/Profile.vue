@@ -45,6 +45,8 @@ const user = computed(() => page.props.auth.user as User);
                 <Label for="name">Name</Label>
                 <Input
                     id="name"
+                    :aria-invalid="errors.name ? true : undefined"
+                    aria-describedby="name-error"
                     class="mt-1 block w-full"
                     name="name"
                     :default-value="user.name"
@@ -52,13 +54,19 @@ const user = computed(() => page.props.auth.user as User);
                     autocomplete="name"
                     placeholder="Vor- und Nachname"
                 />
-                <InputError class="mt-2" :message="errors.name" />
+                <InputError
+                    id="name-error"
+                    class="mt-2"
+                    :message="errors.name"
+                />
             </div>
 
             <div class="grid gap-2">
                 <Label for="email">E-Mail-Adresse</Label>
                 <Input
                     id="email"
+                    :aria-invalid="errors.email ? true : undefined"
+                    aria-describedby="email-error"
                     type="email"
                     class="mt-1 block w-full"
                     name="email"
@@ -67,7 +75,11 @@ const user = computed(() => page.props.auth.user as User);
                     autocomplete="username"
                     placeholder="E-Mail-Adresse"
                 />
-                <InputError class="mt-2" :message="errors.email" />
+                <InputError
+                    id="email-error"
+                    class="mt-2"
+                    :message="errors.email"
+                />
             </div>
 
             <div class="flex items-center gap-4">

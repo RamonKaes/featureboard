@@ -55,38 +55,53 @@ defineOptions({
                 <Label for="current_password">Aktuelles Passwort</Label>
                 <PasswordInput
                     id="current_password"
+                    :aria-invalid="errors.current_password ? true : undefined"
+                    aria-describedby="current_password-error"
                     name="current_password"
                     class="mt-1 block w-full"
                     autocomplete="current-password"
                     placeholder="Aktuelles Passwort"
                 />
-                <InputError :message="errors.current_password" />
+                <InputError
+                    id="current_password-error"
+                    :message="errors.current_password"
+                />
             </div>
 
             <div class="grid gap-2">
                 <Label for="password">Neues Passwort</Label>
                 <PasswordInput
                     id="password"
+                    :aria-invalid="errors.password ? true : undefined"
+                    aria-describedby="password-error"
                     name="password"
                     class="mt-1 block w-full"
                     autocomplete="new-password"
                     placeholder="Neues Passwort"
                     :passwordrules="props.passwordRules"
                 />
-                <InputError :message="errors.password" />
+                <InputError
+                    id="password-error"
+                    :message="errors.password"
+                />
             </div>
 
             <div class="grid gap-2">
                 <Label for="password_confirmation">Passwort bestätigen</Label>
                 <PasswordInput
                     id="password_confirmation"
+                    :aria-invalid="errors.password_confirmation ? true : undefined"
+                    aria-describedby="password_confirmation-error"
                     name="password_confirmation"
                     class="mt-1 block w-full"
                     autocomplete="new-password"
                     placeholder="Passwort bestätigen"
                     :passwordrules="props.passwordRules"
                 />
-                <InputError :message="errors.password_confirmation" />
+                <InputError
+                    id="password_confirmation-error"
+                    :message="errors.password_confirmation"
+                />
             </div>
 
             <div class="flex items-center gap-4">

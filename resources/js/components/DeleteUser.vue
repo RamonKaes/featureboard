@@ -71,11 +71,16 @@ const passwordInput = useTemplateRef('passwordInput');
                             >
                             <PasswordInput
                                 id="password"
+                                :aria-invalid="errors.password ? true : undefined"
+                                aria-describedby="password-error"
                                 name="password"
                                 ref="passwordInput"
                                 placeholder="Passwort"
                             />
-                            <InputError :message="errors.password" />
+                            <InputError
+                                id="password-error"
+                                :message="errors.password"
+                            />
                         </div>
 
                         <DialogFooter class="gap-2">

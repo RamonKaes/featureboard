@@ -231,3 +231,26 @@ test('the appearance choice announces its state', function () {
     expect($page->script('[...document.querySelectorAll("main button[aria-pressed]")].map(b => b.textContent.trim() + "=" + b.getAttribute("aria-pressed")).join()'))
         ->toBe('Hell=false,Dunkel=true,System=false');
 });
+
+test('errors in the settings are tied to their field', function (string $path, string $field, array $fill, string $submit, string $message) {
+    $this->actingAs(User::query()->where('email', 'demo@featureboard.test')->sole());
+
+    $page = visit($path)->assertNoJavaScriptErrors();
+
+    if ($field === 'password' && $path === '/settings/profile') {
+        $page->click('[data-test="delete-user-button"]')->assertSee('wirklich löschen');
+    }
+
+    foreach ($fill as $name => $value) {
+        $page->fill($name, $value);
+    }
+
+    $page->click($submit)->assertSee($message)->wait(0.3);
+
+    expect($page->script("document.getElementById('{$field}').getAttribute('aria-invalid')"))->toBe('true')
+        ->and($page->script("document.getElementById(document.getElementById('{$field}').getAttribute('aria-describedby'))?.textContent"))->toContain($message);
+})->with([
+    'taken email' => ['/settings/profile', 'email', ['email' => 'admin@featureboard.test'], '[data-test="update-profile-button"]', 'bereits'],
+    'wrong current password' => ['/settings/security', 'current_password', ['current_password' => 'wrong-password', 'password' => 'new-password', 'password_confirmation' => 'new-password'], '[data-test="update-password-button"]', 'Passwort'],
+    'wrong password when deleting' => ['/settings/profile', 'password', ['password' => 'wrong-password'], '[data-test="confirm-delete-user-button"]', 'Passwort'],
+]);
