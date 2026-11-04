@@ -54,7 +54,7 @@ gh run list --limit 3              # did CI see exactly this commit, and was it 
 
 ```bash
 ./vendor/bin/sail composer check
-./vendor/bin/sail exec -e XDEBUG_MODE=coverage laravel.test ./vendor/bin/pest --exclude-testsuite=Browser --coverage
+./vendor/bin/sail exec --user sail -e XDEBUG_MODE=coverage laravel.test ./vendor/bin/pest --exclude-testsuite=Browser --coverage
 ./vendor/bin/sail composer audit --locked
 ./vendor/bin/sail npm audit --audit-level=high
 ```
@@ -64,7 +64,7 @@ gh run list --limit 3              # did CI see exactly this commit, and was it 
 **Production-like instance, asked only over HTTP.** Debug output hides real behaviour and leaks in a way production does not. Point it at the `testing` database, never at the development data. Without `--no-reload`, `artisan serve` drops `DB_DATABASE` and `APP_DEBUG` and silently uses `.env`:
 
 ```bash
-./vendor/bin/sail exec -d -e APP_ENV=production -e APP_DEBUG=false -e DB_DATABASE=testing laravel.test php -d variables_order=EGPCS artisan serve --no-reload --host=0.0.0.0 --port=8099
+./vendor/bin/sail exec --user sail -d -e APP_ENV=production -e APP_DEBUG=false -e DB_DATABASE=testing laravel.test php -d variables_order=EGPCS artisan serve --no-reload --host=0.0.0.0 --port=8099
 ./vendor/bin/sail exec laravel.test curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8099/
 ```
 
