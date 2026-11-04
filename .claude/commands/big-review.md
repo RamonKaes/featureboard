@@ -229,7 +229,7 @@ Rate from the reader's view: something an interviewer can trigger in five minute
 
 **Save the report** as `docs/reviews/<date>-<commit>.md`, untracked, for the author to decide about, and print the summary in the conversation:
 
-- **A. Verdict:** commit, scope, machines with exit codes, and "Stand `<commit>`: n BLOCKER, n HIGH, n MEDIUM, n LOW". Say whether the run was blind and in a fresh context.
+- **A. Verdict:** commit, scope, machines with exit codes, and "Stand `<commit>`: n BLOCKER, n HIGH, n MEDIUM, n LOW". Say whether the run was blind and in a fresh context. Name the exact model running this review, read from your own system information rather than from the request or session title, and say so plainly if it differs from the requested one.
 - **B. Findings** by severity: file and line, the failure, trigger, measured evidence, smallest fix with its consumers, and the test that must exist afterwards.
 - **C. The matrix** with every cell filled.
 - **D. Surviving mutants** and uncovered lines, each with its decision.
