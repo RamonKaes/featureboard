@@ -175,5 +175,5 @@ test('a non-numeric id in the search is explained in German', function () {
     $this->actingAs(User::factory()->create())
         ->getJson(route('feature-requests.similar', [Product::factory()->create(), 'title' => 'Mahnung', 'except' => 'abc']))
         ->assertUnprocessable()
-        ->assertJsonPath('errors.except.0', 'Except muss eine ganze Zahl sein.');
+        ->assertJsonPath('errors.except.0', 'Ausnahme muss eine ganze Zahl sein.');
 });

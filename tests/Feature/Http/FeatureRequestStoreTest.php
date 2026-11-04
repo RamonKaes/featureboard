@@ -6,6 +6,7 @@ use App\Enums\FeatureRequestStatus;
 use App\Models\FeatureRequest;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are sent to the login page', function () {
@@ -109,3 +110,14 @@ test('titles in any script with punctuation and emoji are accepted', function (s
     'arabic without controls' => ['تصدير الفواتير'],
     'family emoji with joiners' => ['Export 👨‍👩‍👧 für Familien'],
 ]);
+
+test('a file sent as the title is refused in German', function () {
+    $this->actingAs(User::factory()->create())
+        ->post(route('feature-requests.store', Product::factory()->create()), [
+            'title' => UploadedFile::fake()->create('title.txt', 1),
+            'description' => 'Eine gültige Beschreibung.',
+        ])
+        ->assertSessionHasErrors('title');
+
+    expect(implode(' ', session('errors')->get('title')))->not->toContain('kilobytes');
+});

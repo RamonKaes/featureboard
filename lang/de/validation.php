@@ -10,9 +10,11 @@ return [
     'integer' => ':Attribute muss eine ganze Zahl sein.',
     'lowercase' => ':Attribute darf nur Kleinbuchstaben enthalten.',
     'max' => [
+        'file' => ':Attribute darf höchstens :max Kilobyte groß sein.',
         'string' => ':Attribute darf höchstens :max Zeichen lang sein.',
     ],
     'min' => [
+        'file' => ':Attribute muss mindestens :min Kilobyte groß sein.',
         'string' => ':Attribute muss mindestens :min Zeichen lang sein.',
     ],
     'password' => [
@@ -30,6 +32,7 @@ return [
         'current_password' => 'Aktuelles Passwort',
         'description' => 'Beschreibung',
         'email' => 'E-Mail',
+        'except' => 'Ausnahme',
         'name' => 'Name',
         'password' => 'Passwort',
         'status' => 'Status',
