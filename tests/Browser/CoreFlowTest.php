@@ -7,6 +7,7 @@ use App\Models\FeatureRequest;
 use App\Models\Product;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
+use Illuminate\Support\Facades\Hash;
 
 beforeEach(function () {
     $this->seed(DatabaseSeeder::class);
@@ -288,10 +289,73 @@ test('errors in the settings are tied to their field', function (string $path, s
 
     $page->click($submit)->assertSee($message)->wait(0.3);
 
-    expect($page->script("document.getElementById('{$field}').getAttribute('aria-invalid')"))->toBe('true')
+    expect($page->script('document.activeElement.id'))->toBe($field)
+        ->and($page->script("document.getElementById('{$field}').getAttribute('aria-invalid')"))->toBe('true')
         ->and($page->script("document.getElementById(document.getElementById('{$field}').getAttribute('aria-describedby'))?.textContent"))->toContain($message);
 })->with([
     'taken email' => ['/settings/profile', 'email', ['email' => 'admin@featureboard.test'], '[data-test="update-profile-button"]', 'bereits'],
     'wrong current password' => ['/settings/security', 'current_password', ['current_password' => 'wrong-password', 'password' => 'new-password', 'password_confirmation' => 'new-password'], '[data-test="update-password-button"]', 'Passwort'],
     'wrong password when deleting' => ['/settings/profile', 'password', ['password' => 'wrong-password'], '[data-test="confirm-delete-user-button"]', 'Passwort'],
 ]);
+
+test('a wrong current password is cleared after the first failed attempt', function () {
+    $user = User::query()->where('email', 'demo@featureboard.test')->sole();
+    $this->actingAs($user);
+
+    $page = visit('/settings/security')
+        ->fill('current_password', 'wrong-password')
+        ->fill('password', 'new-password')
+        ->fill('password_confirmation', 'new-password')
+        ->click('[data-test="update-password-button"]')
+        ->assertSee('Das Passwort ist nicht korrekt.')
+        ->wait(0.3);
+
+    expect($page->script("['current_password', 'password', 'password_confirmation'].map((id) => document.getElementById(id).value)"))
+        ->toBe(['', '', '']);
+
+    $page->fill('current_password', 'password')
+        ->fill('password', 'new-password')
+        ->fill('password_confirmation', 'new-password')
+        ->click('[data-test="update-password-button"]')
+        ->assertSee('Passwort aktualisiert.');
+
+    expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue();
+});
+
+test('typed text and saved values stay in plain inputs while a page renders', function () {
+    $this->actingAs(User::query()->where('email', 'demo@featureboard.test')->sole());
+
+    $page = visit('/settings/profile')
+        ->fill('name', 'Neuer Name')
+        ->fill('email', 'admin@featureboard.test')
+        ->click('[data-test="update-profile-button"]')
+        ->assertSee('bereits')
+        ->wait(0.3);
+
+    expect($page->script("document.getElementById('name').value"))->toBe('Neuer Name')
+        ->and($page->script("document.getElementById('email').value"))->toBe('admin@featureboard.test');
+
+    visit('/settings/profile')->assertValue('name', 'Demo-Nutzer')->assertValue('email', 'demo@featureboard.test');
+});
+
+test('turning the page moves the focus to the new content', function () {
+    $page = visit('/products/rechnungsbox')->click('Weiter')->assertSee('Seite 2 von 2')->wait(0.3);
+
+    expect($page->script('document.activeElement.id'))->toBe('main-content');
+
+    $page->click('Zurück')->assertSee('Seite 1 von 2')->wait(0.3);
+
+    expect($page->script('document.activeElement.id'))->toBe('main-content');
+});
+
+test('the close button of the delete dialog is named in German', function () {
+    $this->actingAs(User::query()->where('email', 'demo@featureboard.test')->sole());
+
+    $page = visit('/settings/profile')
+        ->click('[data-test="delete-user-button"]')
+        ->assertSee('wirklich löschen');
+
+    expect($page->script("document.querySelector('[role=dialog]').innerText"))
+        ->toContain('Schließen')
+        ->not->toContain('Close');
+});
