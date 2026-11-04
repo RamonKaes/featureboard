@@ -41,6 +41,8 @@ class FeatureRequestController extends Controller
             ->paginate(self::PER_PAGE, page: $this->pageNumber($request))
             ->withQueryString();
 
+        abort_if($featureRequests->isEmpty() && $featureRequests->currentPage() > 1, 404);
+
         return Inertia::render('featureRequests/Index', [
             'product' => new ProductResource($product),
             'featureRequests' => FeatureRequestResource::collection($featureRequests),

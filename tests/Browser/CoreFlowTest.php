@@ -222,3 +222,12 @@ test('very long words do not overflow any page', function (int $width) {
         expect($page->script('document.documentElement.scrollWidth - document.documentElement.clientWidth'))->toBe(0, $path);
     }
 })->with([320, 1280]);
+
+test('the appearance choice announces its state', function () {
+    $this->actingAs(User::query()->where('email', 'demo@featureboard.test')->sole());
+
+    $page = visit('/settings/appearance')->assertSee('Hell')->click('Dunkel');
+
+    expect($page->script('[...document.querySelectorAll("main button[aria-pressed]")].map(b => b.textContent.trim() + "=" + b.getAttribute("aria-pressed")).join()'))
+        ->toBe('Hell=false,Dunkel=true,System=false');
+});

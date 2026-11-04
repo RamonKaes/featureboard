@@ -7,6 +7,7 @@ return [
     'current_password' => 'Das Passwort ist nicht korrekt.',
     'email' => ':Attribute muss eine gültige E-Mail-Adresse sein.',
     'enum' => ':Attribute ist ungültig.',
+    'integer' => ':Attribute muss eine ganze Zahl sein.',
     'lowercase' => ':Attribute darf nur Kleinbuchstaben enthalten.',
     'max' => [
         'string' => ':Attribute darf höchstens :max Zeichen lang sein.',
