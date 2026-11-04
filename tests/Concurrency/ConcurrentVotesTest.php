@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 use App\Actions\CastVote;
 use App\Actions\ChangeStatus;
+use App\Actions\DeleteUser;
 use App\Enums\FeatureRequestStatus;
 use App\Models\FeatureRequest;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 /*
  * These tests commit real rows, because other processes cannot see an open test transaction.
@@ -54,6 +56,29 @@ function slowDeclineAt(float $start, int $adminId, int $featureRequestId): Closu
     };
 }
 
+/**
+ * Build a task that deletes an account at a shared start time and commits only after a second,
+ * so the second task always runs while the first one is still open.
+ */
+function slowDeleteAt(float $start, int $userId): Closure
+{
+    return function () use ($start, $userId) {
+        time_sleep_until($start);
+
+        try {
+            DB::transaction(function () use ($userId) {
+                app(DeleteUser::class)->handle(User::query()->findOrFail($userId));
+
+                usleep(1_000_000);
+            });
+
+            return 'deleted';
+        } catch (ValidationException) {
+            return 'refused';
+        }
+    };
+}
+
 test('two users voting at the same time are both counted', function () {
     $featureRequest = FeatureRequest::factory()->create();
     $start = microtime(true) + 2;
@@ -93,4 +118,33 @@ test('a vote arriving during a decline is rejected once the decline commits', fu
     expect($outcome)->toBe('rejected')
         ->and($featureRequest->fresh()?->votes_count)->toBe(0)
         ->and($featureRequest->votes()->count())->toBe(0);
+});
+
+test('two admins leaving at the same time leave one admin behind', function () {
+    $first = User::factory()->admin()->create();
+    $second = User::factory()->admin()->create();
+    $start = microtime(true) + 2;
+
+    $outcomes = Concurrency::run([
+        slowDeleteAt($start, $first->id),
+        slowDeleteAt($start + 0.5, $second->id),
+    ]);
+
+    expect($outcomes)->toBe(['deleted', 'refused'])
+        ->and(User::query()->where('is_admin', true)->pluck('id')->all())->toBe([$second->id]);
+});
+
+test('two admins can leave at the same time when a third remains', function () {
+    $first = User::factory()->admin()->create();
+    $second = User::factory()->admin()->create();
+    $third = User::factory()->admin()->create();
+    $start = microtime(true) + 2;
+
+    $outcomes = Concurrency::run([
+        slowDeleteAt($start, $first->id),
+        slowDeleteAt($start + 0.5, $second->id),
+    ]);
+
+    expect($outcomes)->toBe(['deleted', 'deleted'])
+        ->and(User::query()->where('is_admin', true)->pluck('id')->all())->toBe([$third->id]);
 });

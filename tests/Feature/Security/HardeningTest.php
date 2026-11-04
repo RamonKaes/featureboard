@@ -117,7 +117,21 @@ test('the last admin cannot delete the account', function () {
         ->delete(route('profile.destroy'), ['password' => 'password'])
         ->assertSessionHasErrors(['password' => 'Das letzte Admin-Konto kann nicht gelöscht werden.']);
 
+    $this->assertAuthenticatedAs($admin);
+
     expect($admin->fresh())->not->toBeNull();
+});
+
+test('logging out does not bring a deleted account with a remember token back', function () {
+    $user = User::factory()->create(['remember_token' => 'remembered']);
+
+    $this->actingAs($user)
+        ->delete(route('profile.destroy'), ['password' => 'password'])
+        ->assertRedirect('/');
+
+    $this->assertGuest();
+
+    expect(User::query()->whereKey($user->id)->exists())->toBeFalse();
 });
 
 test('an admin can leave when another admin remains', function () {

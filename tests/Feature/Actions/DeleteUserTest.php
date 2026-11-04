@@ -7,6 +7,7 @@ use App\Models\FeatureRequest;
 use App\Models\User;
 use App\Models\Vote;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
 
 test('deleting a user lowers the count of the requests they voted for', function () {
     $user = User::factory()->create();
@@ -60,4 +61,21 @@ test('deleting the account in the settings keeps the counts correct', function (
         ->assertRedirect('/');
 
     expect($featureRequest->fresh()?->votes_count)->toBe(0);
+});
+
+test('the action refuses to delete the last admin', function () {
+    $admin = User::factory()->admin()->create();
+
+    expect(fn () => app(DeleteUser::class)->handle($admin))->toThrow(ValidationException::class);
+
+    expect($admin->fresh())->not->toBeNull();
+});
+
+test('another account can be deleted while only one admin exists', function () {
+    User::factory()->admin()->create();
+    $user = User::factory()->create();
+
+    app(DeleteUser::class)->handle($user);
+
+    expect($user->fresh())->toBeNull();
 });
