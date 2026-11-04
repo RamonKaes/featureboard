@@ -158,3 +158,7 @@ These are limited reviews: both ran with the same tool, the project's `CLAUDE.md
 - **Production:** No deployment and no Content Security Policy. The seeder creates accounts with a known password.
 - **Browsers:** Tests run in Chromium only. On my machine one existing Firefox profile could not open the local app. A fresh profile worked, and I did not find the cause.
 - **Accepted findings:** [docs/REVIEW-LEDGER.md](docs/REVIEW-LEDGER.md) lists the rest, such as votes that stay when an author rewrites a request.
+
+## License
+
+[MIT](LICENSE)
