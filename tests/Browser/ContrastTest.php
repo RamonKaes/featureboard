@@ -12,8 +12,7 @@ use Pest\Browser\Api\Webpage;
  * axe skips aria-hidden text and text that only appears after an action, so this
  * calculates the contrast of every visible text node from its rendered colors.
  */
-const CONTRAST_FAILURES = <<<'JS'
-(() => {
+const CONTRAST_HELPERS = <<<'JS'
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 1;
     const context = canvas.getContext('2d', { willReadFrequently: true });
@@ -46,6 +45,13 @@ const CONTRAST_FAILURES = <<<'JS'
         });
         return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
     };
+    const ratioOf = (first, second) => {
+        const [lighter, darker] = [luminance(first), luminance(second)].sort((a, b) => b - a);
+        return (lighter + 0.05) / (darker + 0.05);
+    };
+JS;
+
+const CONTRAST_FAILURES = '(() => {'.CONTRAST_HELPERS.<<<'JS'
     const failures = new Set();
     for (const element of document.querySelectorAll('body *')) {
         const hasText = [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
@@ -55,11 +61,28 @@ const CONTRAST_FAILURES = <<<'JS'
         if (box.width <= 1 || box.height <= 1 || style.visibility === 'hidden') continue;
         const base = background(element);
         const text = over(toRgba(style.color), base);
-        const [lighter, darker] = [luminance(text), luminance(base)].sort((a, b) => b - a);
-        const ratio = (lighter + 0.05) / (darker + 0.05);
+        const ratio = ratioOf(text, base);
         const size = parseFloat(style.fontSize);
         const required = size >= 24 || (size >= 18.66 && parseInt(style.fontWeight, 10) >= 700) ? 3 : 4.5;
         if (ratio < required) failures.add(`${ratio.toFixed(2)}: ${element.textContent.trim().slice(0, 40)}`);
+    }
+    return [...failures];
+})()
+JS;
+
+/**
+ * WCAG 1.4.11 asks for 3:1 where a border marks a control. Nothing else measures borders.
+ */
+const BORDER_FAILURES = '(() => {'.CONTRAST_HELPERS.<<<'JS'
+    const failures = new Set();
+    for (const element of document.querySelectorAll('button, a[data-slot="button"], input:not([type="hidden"]), textarea')) {
+        const style = getComputedStyle(element);
+        const box = element.getBoundingClientRect();
+        const color = toRgba(style.borderTopColor);
+        if (box.width <= 1 || box.height <= 1 || parseFloat(style.borderTopWidth) === 0 || color.a === 0) continue;
+        const base = background(element.parentElement);
+        const ratio = ratioOf(over(color, base), base);
+        if (ratio < 3) failures.add(`${ratio.toFixed(2)}: ${element.textContent.trim().slice(0, 40) || element.name}`);
     }
     return [...failures];
 })()
@@ -142,4 +165,24 @@ test('the status control and every badge have enough contrast', function (bool $
     $page = visitInScheme("/products/terminzeit/requests/{$featureRequest->id}", $darkMode)->assertSee('Status ändern');
 
     expect($page->script(CONTRAST_FAILURES))->toBe([]);
+})->with('color schemes');
+
+test('the borders of controls have enough contrast', function (string $path, string $heading, bool $darkMode) {
+    $this->actingAs(User::query()->where('is_admin', true)->sole());
+    $featureRequest = FeatureRequest::query()->where('title', 'Warteliste für ausgebuchte Tage')->sole();
+
+    $page = visitInScheme(str_replace('{id}', (string) $featureRequest->id, $path), $darkMode)->assertSee($heading);
+
+    expect($page->script(BORDER_FAILURES))->toBe([]);
+})->with([
+    'status buttons' => ['/products/terminzeit/requests/{id}', 'Status ändern'],
+    'requests and pagination' => ['/products/rechnungsbox', 'Rechnungsbox'],
+    'form fields' => ['/products/rechnungsbox/requests/create', 'Pflichtfelder'],
+    'settings' => ['/settings/profile', 'Konto löschen'],
+])->with('color schemes');
+
+test('the sign-in prompt for guests has a visible border', function (bool $darkMode) {
+    $page = visitInScheme('/products/rechnungsbox', $darkMode)->assertSee('Rechnungsbox');
+
+    expect($page->script(BORDER_FAILURES))->toBe([]);
 })->with('color schemes');
