@@ -57,7 +57,7 @@ Feature wishes arrive by email, ticket and chat, so the same wish gets written d
 - Admins move wishes through a fixed workflow: `new`, `planned`, `in_progress`, `done`, with `declined` possible from the first two.
 - A public roadmap shows what is planned, in progress and done, without an account.
 
-Claude Code suggested this idea, and I kept it for three reasons: every product team knows the problem, so it needs no explanation. It runs without API keys or outside services, so anyone can start it and its tests give the same result every time. And it is small, but it has real rules to get right, such as votes arriving during a status change.
+I chose this idea for three reasons: every product team knows the problem, so it needs no explanation. It runs without API keys or outside services, so anyone can start it and its tests give the same result every time. And it is small, but it has real rules to get right, such as votes arriving during a status change.
 
 The interface is in German, and the code and documentation are in English.
 

@@ -12,7 +12,7 @@ Der Kern ist ein kleiner Moment im Formular: Schon beim Tippen des Titels ersche
 
 ![Ähnliche Wünsche beim Tippen](docs/screenshots/similar-requests.png)
 
-Die Idee hat Claude Code vorgeschlagen, und ich habe sie aus drei Gründen behalten. Jedes Produktteam kennt das Problem, es braucht also keine Erklärung. Die Anwendung läuft ohne API-Schlüssel und fremde Dienste, jeder kann sie starten, und die Tests liefern immer dasselbe Ergebnis. Und sie ist klein, hat aber echte Regeln, die stimmen müssen, etwa wenn eine Stimme genau in dem Moment eintrifft, in dem ein Admin den Wunsch ablehnt. Der Preis: Boards dieser Art sind ein verbreitetes Demo-Thema. Den Unterschied macht die Abstimmung direkt im Hinweis.
+Ich habe mich aus drei Gründen für diese Idee entschieden. Jedes Produktteam kennt das Problem, es braucht also keine Erklärung. Die Anwendung läuft ohne API-Schlüssel und fremde Dienste, jeder kann sie starten, und die Tests liefern immer dasselbe Ergebnis. Und sie ist klein, hat aber echte Regeln, die stimmen müssen, etwa wenn eine Stimme genau in dem Moment eintrifft, in dem ein Admin den Wunsch ablehnt. Der Preis: Boards dieser Art sind ein verbreitetes Demo-Thema. Den Unterschied macht die Abstimmung direkt im Hinweis.
 
 ## Schnellstart
 

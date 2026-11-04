@@ -240,7 +240,7 @@ The planner uses the GIN index when it helps. For very common words a sequential
 
 ## 28. The idea
 
-**Decision:** A feature request board. Claude Code suggested it, and the author kept it.
+**Decision:** A feature request board.
 
 **Reason:** Every product team knows the problem, it runs without API keys or outside services, and its tests are deterministic. It is small but has real rules: a fixed workflow, one vote per account under concurrency, and a search that stops duplicates before they exist.
 
