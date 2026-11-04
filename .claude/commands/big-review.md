@@ -61,14 +61,14 @@ gh run list --limit 3              # did CI see exactly this commit, and was it 
 
 `laravel/pao` shortens tool output and changes arguments for AI agents. Use `-e PAO_DISABLE=1` when you need full output, and `--log-junit` when you need test names.
 
-**Production-like instance, asked only over HTTP.** Debug output hides real behaviour and leaks in a way production does not. Point it at the `testing` database, never at the development data:
+**Production-like instance, asked only over HTTP.** Debug output hides real behaviour and leaks in a way production does not. Point it at the `testing` database, never at the development data. Without `--no-reload`, `artisan serve` drops `DB_DATABASE` and `APP_DEBUG` and silently uses `.env`:
 
 ```bash
-./vendor/bin/sail exec -d -e APP_ENV=production -e APP_DEBUG=false -e DB_DATABASE=testing laravel.test php -d variables_order=EGPCS artisan serve --host=0.0.0.0 --port=8099
+./vendor/bin/sail exec -d -e APP_ENV=production -e APP_DEBUG=false -e DB_DATABASE=testing laravel.test php -d variables_order=EGPCS artisan serve --no-reload --host=0.0.0.0 --port=8099
 ./vendor/bin/sail exec laravel.test curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8099/
 ```
 
-Confirm that the instance really runs without debug by provoking an error, and read `storage/logs/laravel.log` afterwards. Throttles apply to you too, so say when you measured a 429 instead of the app.
+Before attacking, insert a marker row only into the target database and see it on the instance. Without that check the attacks may hit the demo data. Confirm that the instance really runs without debug by provoking an error, and read `storage/logs/laravel.log` afterwards. Throttles apply to you too, so say when you measured a 429 instead of the app.
 
 **From zero, once per run.** Clone into a folder that is **not** named `featureboard`, because the same name shares the Compose project and the database volume with the development setup. Stop the running stack first because of the ports. Follow the README literally. Every deviation is a finding, because the setup is a promise. Clean up only what you created.
 
