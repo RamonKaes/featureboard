@@ -1,0 +1,89 @@
+name: portability
+
+# Started by hand. A real Mac with Docker Desktop is not available as a runner,
+# so this covers its two parts separately: ARM containers and macOS tooling.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  readme-on-arm:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+
+    steps:
+      - name: Clone as the README says
+        run: |
+          git clone "https://github.com/${GITHUB_REPOSITORY}.git" featureboard
+          git -C featureboard checkout "${GITHUB_SHA}"
+
+      - name: Follow the README setup
+        working-directory: featureboard
+        run: |
+          cp .env.example .env
+          docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html laravelsail/php84-composer:latest composer install --ignore-platform-reqs
+          ./vendor/bin/sail up -d --wait
+          ./vendor/bin/sail artisan key:generate
+          ./vendor/bin/sail artisan migrate --seed
+          ./vendor/bin/sail npm ci
+          ./vendor/bin/sail npm run build
+
+      - name: Open the app
+        run: curl --fail --silent --show-error http://localhost:8000 | grep --quiet Rechnungsbox
+
+      - name: Run the README checks
+        working-directory: featureboard
+        run: |
+          ./vendor/bin/sail npm run browsers:install
+          ./vendor/bin/sail composer check
+
+      - name: Show container logs
+        if: failure()
+        working-directory: featureboard
+        run: ./vendor/bin/sail logs --tail=100
+
+  frontend-on-macos:
+    runs-on: macos-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.5'
+          extensions: pdo_pgsql
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --prefer-dist
+          npm ci
+
+      - name: Prepare application
+        run: |
+          cp .env.example .env
+          php artisan key:generate --ansi
+          php artisan wayfinder:generate --with-form --no-interaction
+
+      - name: Frontend lint and format
+        run: npm run check
+
+      - name: Frontend types
+        run: npm run types:check
+
+      - name: Frontend build
+        run: npm run build
