@@ -6,10 +6,11 @@ namespace App\Exceptions;
 
 use App\Enums\FeatureRequestStatus;
 use DomainException;
+use Illuminate\Contracts\Debug\ShouldntReport;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 
-class InvalidStatusTransition extends DomainException
+class InvalidStatusTransition extends DomainException implements ShouldntReport
 {
     public function __construct(FeatureRequestStatus $from, FeatureRequestStatus $to)
     {

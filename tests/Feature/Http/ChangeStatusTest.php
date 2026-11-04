@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\FeatureRequestStatus as Status;
 use App\Models\FeatureRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\Exceptions;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('admins see only the allowed transitions on the detail page', function (Status $status, array $expected) {
@@ -87,3 +88,15 @@ test('unknown statuses are rejected in German', function (string $status, string
     'unknown' => ['archived', 'Status ist ungültig.'],
     'missing' => ['', 'Bitte gib Status an.'],
 ]);
+
+test('a refused status change is an expected answer, not an error for the log', function () {
+    Exceptions::fake();
+    $featureRequest = FeatureRequest::factory()->create(['status' => Status::Done]);
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->from(route('feature-requests.show', [$featureRequest->product, $featureRequest]))
+        ->put(route('feature-requests.status.update', $featureRequest), ['status' => Status::New->value])
+        ->assertRedirect();
+
+    Exceptions::assertNothingReported();
+});
