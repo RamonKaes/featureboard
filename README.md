@@ -47,7 +47,7 @@ The first command downloads a browser into `node_modules` and is needed once. `c
 Software teams collect feature wishes in emails, tickets and chats, so duplicates pile up and nobody sees what users really want. Featureboard gives each product one public place:
 
 - Users submit wishes and vote for those of others, one vote per account.
-- While someone types a title, the form shows similar existing wishes, so fewer duplicates appear.
+- While someone types a title, the form shows similar existing wishes with a vote button, so a duplicate can become a vote right there.
 - Admins move wishes through a fixed workflow: `new`, `planned`, `in_progress`, `done`, with `declined` possible from the first two.
 - A public roadmap shows what is planned, in progress and done, without an account.
 
@@ -111,8 +111,8 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 
 | Check         | Result                                                                                                                                                       |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Tests         | 353 tests with 1,327 assertions, against PostgreSQL                                                                                                          |
-| Browser tests | 101 tests with 322 assertions                                                                                                                                |
+| Tests         | 355 tests with 1,349 assertions, against PostgreSQL                                                                                                          |
+| Browser tests | 107 tests with 345 assertions                                                                                                                                |
 | Coverage      | 98.3% of lines in `app/`, without browser tests                                                                                                              |
 | Larastan      | Level 9, 0 errors, no baseline and no ignored errors                                                                                                         |
 | Pint          | Laravel preset plus strict types and strict comparison                                                                                                       |
