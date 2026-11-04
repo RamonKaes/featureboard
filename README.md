@@ -113,7 +113,7 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Tests         | 355 tests with 1,349 assertions, against PostgreSQL                                                                                                          |
 | Browser tests | 107 tests with 345 assertions                                                                                                                                |
-| Coverage      | 98.3% of lines in `app/`, without browser tests                                                                                                              |
+| Coverage      | 98.4% of lines in `app/`, without browser tests                                                                                                              |
 | Larastan      | Level 9, 0 errors, no baseline and no ignored errors                                                                                                         |
 | Pint          | Laravel preset plus strict types and strict comparison                                                                                                       |
 | Frontend      | Vite+ lint and format, `vue-tsc` without errors                                                                                                              |
