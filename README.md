@@ -111,8 +111,8 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 
 | Check         | Result                                                                                                                    |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Tests         | 296 tests with 1,075 assertions, against PostgreSQL                                                                       |
-| Browser tests | 79 tests with 174 assertions                                                                                              |
+| Tests         | 306 tests with 1,122 assertions, against PostgreSQL                                                                       |
+| Browser tests | 87 tests with 287 assertions                                                                                              |
 | Coverage      | 98.2% of lines in `app/`, without browser tests                                                                           |
 | Larastan      | Level 9, 0 errors, no baseline and no ignored errors                                                                      |
 | Pint          | Laravel preset plus strict types and strict comparison                                                                    |
@@ -126,7 +126,7 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 - **Hostile input:** A test takes every route from the router and sends arrays, NUL bytes, invalid UTF-8, overflowing ids and more in every known field and path parameter, as guest and as admin. None may end in a server error.
 - **Concurrency:** Separate processes vote at the same moment against committed rows. Removing the lock makes the test for a vote arriving during a decline fail, and removing the increment as well loses votes. Both were checked by mutation.
 - **CI:** GitHub Actions runs Pint, Larastan, the frontend checks, the tests with a PostgreSQL service, the build and the browser tests.
-- **Review:** [`/big-review`](.claude/commands/big-review.md) is a hostile audit that starts blind, without the project's explanations. It runs the machines and mutation tests, attacks every entrance on twelve axes (form, value, structure, identity, frequency, concurrency, volume, time, state, abuse, error path, display), tries abuse with several accounts, measures every claim in this README, and must list what it did not check. The first run found 4 blockers, 6 high, 16 medium and 8 low findings while all checks were green. All blockers and high findings are fixed with tests. The medium and low findings are still open, and no second run has confirmed the fixes yet.
+- **Review:** [`/big-review`](.claude/commands/big-review.md) is a hostile audit that starts blind, without the project's explanations. It runs the machines and mutation tests, attacks every entrance on twelve axes (form, value, structure, identity, frequency, concurrency, volume, time, state, abuse, error path, display), tries abuse with several accounts, measures every claim in this README, and must list what it did not check. The first run found 4 blockers, 6 high, 16 medium and 8 low findings while all checks were green. All blockers and high findings and six medium findings are fixed with tests. The other medium and low findings are still open, and no second run has confirmed the fixes yet.
 - **Limits of the tools:** axe missed two contrast failures that the calculation found, so green tools alone are not treated as proof.
 
 ## Known limitations
@@ -136,7 +136,7 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 - **Moderation:** Nothing public can be removed without database access, neither by admins nor by authors. Rate limits slow spam down, but declined requests stay in the list.
 - **One vote per account, not per person:** There is no email verification, so someone with several addresses and connections can vote several times.
 - **Password reset:** It reveals whether an account exists and has no rate limit of its own.
-- **Findings left open:** The review report lists further medium findings, such as focus lost after a vote, English error pages and overflowing long words.
+- **Findings left open:** The review report lists further medium findings, for example sessions that survive a password change, passwords longer than bcrypt reads, and an admin who can delete the last admin account.
 - **Vote counts:** A direct `$user->delete()` that bypasses the `DeleteUser` action leaves counts too high.
 - **Editing:** The edit form checks its permission without a row lock, so an edit at the exact moment of a status change can still go through.
 - **Status changes:** `done` and `declined` are final and have no confirmation step, so a misclick cannot be undone in the interface.

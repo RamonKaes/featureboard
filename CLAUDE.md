@@ -52,4 +52,5 @@ Each rule comes from a concrete case.
 - **Test hostile input, not only valid input.** `?status[]=done` answered visitors with HTTP 500 after hundreds of green tests. Read the routes from the router, so that new ones are attacked too.
 - **Verify after starting something.** A session asked to use another model ran on the default, and nobody checked until minutes later. Read back what was really set.
 - **Bind every form field the same way.** A `:value` next to a `v-model` in one form slot erased the description on every keystroke in the title, and only one fill order was tested.
+- **Error views need their exact status.** `errors/4xx.blade.php` looked like enough, but Laravel's own `403` or `404` views win over it, so each one needs its own file.
 - **Check the kit's `.gitignore`.** It ignored `CLAUDE.md`, which this project must commit.

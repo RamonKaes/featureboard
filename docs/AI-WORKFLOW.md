@@ -144,4 +144,6 @@ How the author and Claude Code (model Claude Opus 5.5) worked together, stage by
 
 **AI mistakes it found:** Typing a title erased the description since stage 5. Sentences in the README claimed more than was measured. A second English heading came from an accessibility fix in stage 7. The new input guard missed cookies and values just below the overflow it tested.
 
-**Decided by the author:** Fix all blockers and high findings. Medium findings stay open for now.
+**Decided by the author:** Fix all blockers and high findings, then six medium findings before reading the code.
+
+**Second round:** The desktop session ended during a browser test run, and the cause could not be found in the logs available to Claude. Nothing was lost. Claude's assumption that `preserveState` keeps the focus after a vote was wrong: the test stayed red, and the card moving in the sorted list was the likely reason. A global `4xx` error view did not apply either, because the framework's own views for single statuses win.

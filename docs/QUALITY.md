@@ -84,4 +84,15 @@ A review in a fresh session with Claude Opus 5.5 found 4 blockers, 6 high, 16 me
 | Foreign Host header poisoned the reset link     | `trustHosts()`, active outside local and test environments                         |
 | No limit on submissions and registration        | Rate limits and a test that every writing route has one or a stated exemption      |
 
-The medium and low findings stay open, and moderation stays a documented limitation.
+A second round fixed six medium findings, also test first:
+
+| Finding                                                  | Fix                                                                       |
+| -------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Focus fell to the body after a vote                      | The button takes it back after the response                               |
+| Failed auth forms lost the focus and did not link errors | Focus moves to the first invalid field, linked through `aria-describedby` |
+| Two `h1` on settings pages, one English                  | Removed, and the accessibility test counts one `h1` per page              |
+| Long words overflowed public pages                       | `overflow-wrap: anywhere` on the body, tested at 320 and 1280 px          |
+| A test could not notice a reset that saves nothing       | The test logs in with the new password and fails with the old one         |
+| English error pages without a way back                   | German pages for every status                                             |
+
+The other medium and low findings stay open, and moderation stays a documented limitation.
