@@ -117,17 +117,16 @@ Moderation stays a documented limitation.
 
 A second review in a fresh session with Claude Fable 5.1 found 0 blockers, 1 high, 4 medium and 10 low findings, with all machines green and the sampled fixes of the first review still holding. The worst findings were reproduced first, which also corrected two of its claims. Each fix has a test that failed first:
 
-| Finding | Fix |
-| --- | --- |
-| Two admins leaving at once removed every admin, in 6 of 8 attempts | `DeleteUser` locks all admin rows and decides in the transaction, tested with real processes |
-| Invisible titles and direction overrides were accepted | Titles need 3 letters or digits and refuse direction overrides |
-| One address could try unlimited accounts at the login | A second limit of 30 per minute and address. The timing leak the review reported hides on an idle server and stays in the ledger |
-| Outline buttons had a border of 1.17:1 in the light theme | Same color as form fields, and `ContrastTest` now calculates borders |
-| The review prompt reached neither its database nor its debug setting | `--no-reload` and a required marker row |
+| Finding                                                              | Fix                                                                                                                              |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Two admins leaving at once removed every admin, in 6 of 8 attempts   | `DeleteUser` locks all admin rows and decides in the transaction, tested with real processes                                     |
+| Invisible titles and direction overrides were accepted               | Titles need 3 letters or digits and refuse direction overrides                                                                   |
+| One address could try unlimited accounts at the login                | A second limit of 30 per minute and address. The timing leak the review reported hides on an idle server and stays in the ledger |
+| Outline buttons had a border of 1.17:1 in the light theme            | Same color as form fields, and `ContrastTest` now calculates borders                                                             |
+| The review prompt reached neither its database nor its debug setting | `--no-reload` and a required marker row                                                                                          |
 
 Four low findings were fixed too: refused status changes no longer log as errors, settings errors are tied to their fields, English validation texts are translated, and an empty override is gone. Mutation testing scored 78.27% in this run, without timeouts and before the tests added afterwards.
 
 ## Manual walk through the app
 
 A walk through every role in the browser found no server errors, but seven small flaws that no test covered. Four are fixed with tests: focus lost after turning a page and after errors in the settings, an English dialog label, and a wrong current password that stayed in its field. The cause of the last one was the kit's input, whose private copy of its value undid Inertia's reset. The other three are in the ledger.
-
