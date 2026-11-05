@@ -77,13 +77,11 @@ The interface is in German, and the code and documentation are in English.
 - **Claude Fable 5.1**, in the same tool, ran the second review. The first review ran on Opus 5.5.
 - The app's **built-in browser** was used to check the interface.
 - The **a11y-enforcer** plugin provided the static accessibility scan and the contrast calculation.
-- **Laravel Boost** was not used while building. Its MCP server first failed because the package was missing, and on the host it can't reach the database, which only resolves inside the Sail network. It is now set up in `.mcp.json` to start through Sail, and a direct call returned the real schema.
+- **Laravel Boost** was not used while building. It is now set up in `.mcp.json` to start through Sail, because the database only resolves inside the Sail network, and it was used in the final walk through the app.
 
 ## Approach
 
-I wrote a brief with nine stages and fixed rules, and Claude Code worked through it. After every stage it stopped, reported with measured results and explained the central code, and it continued only after my approval. The rules are in [CLAUDE.md](CLAUDE.md), and every stage is logged in [docs/AI-WORKFLOW.md](docs/AI-WORKFLOW.md).
-
-**The rules:** Measure instead of guessing, test business rules first, stay within the stage's scope, and keep everything green.
+I wrote a brief with nine stages and fixed rules, and Claude Code worked through it. After every stage it stopped, reported with measured results and explained the central code, and it continued only after my approval. The rules, such as measuring instead of guessing and testing business rules first, are in [CLAUDE.md](CLAUDE.md), and every stage is logged in [docs/AI-WORKFLOW.md](docs/AI-WORKFLOW.md).
 
 **How I steered it:**
 
@@ -94,9 +92,7 @@ I wrote a brief with nine stages and fixed rules, and Claude Code worked through
 
 **Where the AI was wrong:**
 
-- Its setup plan ignored that `create-project` already runs the kit's feature installer, so the kit had to be reinstalled.
 - Its first concurrency tests stayed green with the row lock removed, because it had assumed the lock protected the vote count. A mutation check showed that the lock protects something else, and a new test now covers that.
-- Its first accessibility tests checked 404 pages, because they assumed database ids.
 - It once read a failing test as passing, because it had cut the result line from the output. A similar mistake happened again later, so that rule does not make it immune.
 - Requests like `?status[]=done` or `/requests/abc` ended in HTTP 500, after hundreds of green tests that only sent valid input. A guard that attacks every route found these and more.
 - Reviews were wrong too. The second one proposed a fix that PostgreSQL refuses, and it overstated a timing leak that Laravel hides on an idle server. Both showed up only because its findings were reproduced before anything was fixed.
@@ -138,14 +134,14 @@ All numbers were measured on the final code. See [docs/QUALITY.md](docs/QUALITY.
 
 ### Review
 
-[`/big-review`](.claude/commands/big-review.md) is a hostile audit in a new session that did not build the code. It starts without the project's explanations, runs every machine and mutation tests, attacks every entrance on twelve axes (form, value, structure, identity, frequency, concurrency, volume, time, state, abuse, error path, display), tries abuse with several accounts, measures every claim in this README, and must list what it did not check.
+[`/big-review`](.claude/commands/big-review.md) is a hostile audit in a new session that did not build the code. It starts without the project's explanations, runs every machine and mutation tests, attacks every entrance, tries abuse with several accounts, measures every claim in this README, and must list what it did not check.
 
 | Run | Model            | Blocker | High | Medium | Low |
 | --- | ---------------- | ------- | ---- | ------ | --- |
 | 1   | Claude Opus 5.5  | 4       | 6    | 16     | 8   |
 | 2   | Claude Fable 5.1 | 0       | 1    | 4      | 10  |
 
-All checks were green before both runs, so the green checks alone would have missed every one of these. All blockers and high findings are fixed with tests, and the second run found that the sampled fixes of the first still hold. Its worst find: two admins deleting themselves at once left no admin behind in 6 of 8 attempts. What stays open is listed with reasons in [docs/REVIEW-LEDGER.md](docs/REVIEW-LEDGER.md), and no third run has confirmed the latest fixes.
+All checks were green before both runs. All blockers and high findings are fixed with tests, and the second run found that the sampled fixes of the first still hold. Its worst find: two admins deleting themselves at once left no admin behind in 6 of 8 attempts. What stays open is listed with reasons in [docs/REVIEW-LEDGER.md](docs/REVIEW-LEDGER.md), and no third run has confirmed the latest fixes.
 
 These are limited reviews: both ran with the same tool, the project's `CLAUDE.md` was loaded from the start, and neither is an independent review by a person. Mutation testing scored 78.27% in the second run, before the tests added afterwards, and the survivors were decided one by one.
 
